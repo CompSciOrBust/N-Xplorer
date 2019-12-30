@@ -6,13 +6,14 @@
 #include <dirent.h>
 #include <iostream>
 #include <fstream>
+#include <time.h>
 using namespace std;
 
 class ExplorerUI : public UIWindow
 {
 	private:
 	//vars
-	int HeaderHeight = 0;
+	int HeaderHeight = 50;
 	public:
 	//vars
 	ScrollList *FileList;
@@ -26,6 +27,7 @@ class ExplorerUI : public UIWindow
 	void DrawUI();
 	void OpenFile(string);
 	void LoadListDirs(string);
+	void DrawHeader();
 };
 
 ExplorerUI::ExplorerUI()
@@ -124,10 +126,38 @@ void ExplorerUI::DrawUI()
 	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
 	SDL_Rect BGRect = {0,0, Width, Height};
 	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the header
+	DrawHeader();
 	//Draw the list
 	FileList->DrawList();
-	//Update file list
-	//LoadListDirs(DirPath);
+}
+
+void ExplorerUI::DrawHeader()
+{
+	//Draw rect
+	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_Rect HeaderRect = {0,0, Width, HeaderHeight};
+	SDL_RenderFillRect(Renderer, &HeaderRect);
+	//Vars for the text
+	SDL_Color TextColour = {255, 255, 255};
+	//Draw the title
+	SDL_Surface* TitleTextSurface = TTF_RenderText_Blended_Wrapped(FileList->ListFont, "N-Xplorer", TextColour, Width);
+	SDL_Texture* TitleTextTexture = SDL_CreateTextureFromSurface(Renderer, TitleTextSurface);
+	SDL_Rect TitleRect = {0, (HeaderHeight - TitleTextSurface->h) / 2, TitleTextSurface->w, TitleTextSurface->h};
+	SDL_RenderCopy(Renderer, TitleTextTexture, NULL, &TitleRect);
+	SDL_DestroyTexture(TitleTextTexture);
+	SDL_FreeSurface(TitleTextSurface);
+	//Draw the time (thanks Lucy from AtlasNX for the simple code)
+	time_t t = time(NULL);
+	struct tm *tm = localtime(&t);
+	char date[87];
+	sprintf(date, "%02d/%02d/%d %02d:%02d", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min);
+	SDL_Surface* TimeTextSurface = TTF_RenderText_Blended_Wrapped(FileList->ListFont, date, TextColour, Width);
+	SDL_Texture* TimeTextTexture = SDL_CreateTextureFromSurface(Renderer, TimeTextSurface);
+	SDL_Rect TimeRect = {Width - TimeTextSurface->w, (HeaderHeight - TimeTextSurface->h) / 2, TimeTextSurface->w, TimeTextSurface->h};
+	SDL_RenderCopy(Renderer, TimeTextTexture, NULL, &TimeRect);
+	SDL_DestroyTexture(TimeTextTexture);
+	SDL_FreeSurface(TimeTextSurface);
 }
 
 void ExplorerUI::OpenFile(string Path)

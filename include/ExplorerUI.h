@@ -6,7 +6,7 @@ class ExplorerUI : public UIWindow
 {
 	private:
 	//vars
-	int HeaderHeight = 0;
+	int HeaderHeight = 50;
 	public:
 	//vars
 	ScrollList *FileList;
@@ -20,6 +20,7 @@ class ExplorerUI : public UIWindow
 	void DrawUI();
 	void OpenFile(string);
 	void LoadListDirs(string);
+	void DrawHeader();
 };
 
 class MenuUI : public UIWindow
