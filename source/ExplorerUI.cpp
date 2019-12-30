@@ -14,6 +14,7 @@ class ExplorerUI : public UIWindow
 	private:
 	//vars
 	int HeaderHeight = 50;
+	int FooterHeight = 50;
 	public:
 	//vars
 	ScrollList *FileList;
@@ -28,6 +29,7 @@ class ExplorerUI : public UIWindow
 	void OpenFile(string);
 	void LoadListDirs(string);
 	void DrawHeader();
+	void DrawFooter();
 };
 
 ExplorerUI::ExplorerUI()
@@ -42,7 +44,7 @@ ExplorerUI::ExplorerUI()
 	//FileList->TouchListY = &TouchY;
 	FileList->ListFont = GetSharedFont(32); //Load the list font
 	FileList->ListingsOnScreen = 10;
-	FileList->ListHeight = Height - HeaderHeight;
+	FileList->ListHeight = Height - HeaderHeight - FooterHeight;
 	FileList->ListWidth = Width;
 	FileList->ListYOffset = HeaderHeight;
 	FileList->IsActive = true;
@@ -128,6 +130,8 @@ void ExplorerUI::DrawUI()
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the header
 	DrawHeader();
+	//Draw the footer
+	DrawFooter();
 	//Draw the list
 	FileList->DrawList();
 }
@@ -158,6 +162,23 @@ void ExplorerUI::DrawHeader()
 	SDL_RenderCopy(Renderer, TimeTextTexture, NULL, &TimeRect);
 	SDL_DestroyTexture(TimeTextTexture);
 	SDL_FreeSurface(TimeTextSurface);
+}
+
+void ExplorerUI::DrawFooter()
+{
+	//Draw rect
+	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_Rect FooterRect = {0, Height - FooterHeight, Width, FooterHeight};
+	SDL_RenderFillRect(Renderer, &FooterRect);
+	//Vars for the text
+	SDL_Color TextColour = {255, 255, 255};
+	//Draw the path
+	SDL_Surface* PathTextSurface = TTF_RenderText_Blended_Wrapped(FileList->ListFont, DirPath.c_str(), TextColour, Width);
+	SDL_Texture* PathTextTexture = SDL_CreateTextureFromSurface(Renderer, PathTextSurface);
+	SDL_Rect PathRect = {0, (Height - FooterHeight) + (FooterHeight - PathTextSurface->h) / 2, PathTextSurface->w, PathTextSurface->h};
+	SDL_RenderCopy(Renderer, PathTextTexture, NULL, &PathRect);
+	SDL_DestroyTexture(PathTextTexture);
+	SDL_FreeSurface(PathTextSurface);
 }
 
 void ExplorerUI::OpenFile(string Path)
