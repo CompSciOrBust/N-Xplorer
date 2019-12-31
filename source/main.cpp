@@ -5,7 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <switch.h>
 #include <ExplorerUI.h>
-//#include <TextEditUI.h>
+#include <TextUI.h>
 using namespace std;
 
 // Main program entrypoint
@@ -81,6 +81,13 @@ int main(int argc, char* argv[])
 	Menu->MenuList->Renderer = Renderer;
 	Menu->Explorer = Explorer;
 	
+	//Init text editor
+	TextUI *TextEditor = new TextUI();
+	TextEditor->Renderer = Renderer;
+	TextEditor->IsDone = &Done;
+	TextEditor->Event = &Event;
+	TextEditor->WindowState = &WindowState;
+	TextEditor->ChosenFile = &ChosenFile;
 	//Main loop
 	while(!Done)
 	{
@@ -93,6 +100,8 @@ int main(int argc, char* argv[])
 			{
 				Explorer->GetInput();
 				Explorer->DrawUI();
+				//If switched to the text editor we need to load the file
+				if(WindowState == 2) TextEditor->LoadFile();
 			}
 			break;
 			//Draw the menu
@@ -105,6 +114,10 @@ int main(int argc, char* argv[])
 			break;
 			//Draw the text editor
 			case 2:
+			{
+				TextEditor->GetInput();
+				TextEditor->DrawUI();
+			}
 			break;
 			//Draw he image viewer
 			case 3:
