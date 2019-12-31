@@ -7,14 +7,16 @@
 #include <iostream>
 #include <fstream>
 #include <time.h>
+#include <SDL2/SDL_ttf.h>
 using namespace std;
 
 class ExplorerUI : public UIWindow
 {
 	private:
 	//vars
-	int HeaderHeight = 50;
+	int HeaderHeight = 55;
 	int FooterHeight = 50;
+	TTF_Font *HeaderFooterFont;
 	public:
 	//vars
 	ScrollList *FileList;
@@ -42,15 +44,15 @@ ExplorerUI::ExplorerUI()
 	//Set up the file list
 	//FileList->TouchListX = &TouchX;
 	//FileList->TouchListY = &TouchY;
-	FileList->ListFont = GetSharedFont(32); //Load the list font
-	FileList->ListingsOnScreen = 10;
+	FileList->ListFont = GetSharedFont(30); //Load the list font
+	FileList->ListingsOnScreen = 15;
 	FileList->ListHeight = Height - HeaderHeight - FooterHeight;
 	FileList->ListWidth = Width;
 	FileList->ListYOffset = HeaderHeight;
 	FileList->IsActive = true;
-	
 	//Populate list
 	LoadListDirs(DirPath);
+	HeaderFooterFont = GetSharedFont(40);
 }
 
 void ExplorerUI::GetInput()
@@ -125,7 +127,7 @@ void ExplorerUI::GetInput()
 void ExplorerUI::DrawUI()
 {
 	//Draw the BG
-	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
 	SDL_Rect BGRect = {0,0, Width, Height};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the header
@@ -145,7 +147,7 @@ void ExplorerUI::DrawHeader()
 	//Vars for the text
 	SDL_Color TextColour = {255, 255, 255};
 	//Draw the title
-	SDL_Surface* TitleTextSurface = TTF_RenderText_Blended_Wrapped(FileList->ListFont, "N-Xplorer", TextColour, Width);
+	SDL_Surface* TitleTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, "N-Xplorer", TextColour, Width);
 	SDL_Texture* TitleTextTexture = SDL_CreateTextureFromSurface(Renderer, TitleTextSurface);
 	SDL_Rect TitleRect = {0, (HeaderHeight - TitleTextSurface->h) / 2, TitleTextSurface->w, TitleTextSurface->h};
 	SDL_RenderCopy(Renderer, TitleTextTexture, NULL, &TitleRect);
@@ -156,7 +158,7 @@ void ExplorerUI::DrawHeader()
 	struct tm *tm = localtime(&t);
 	char date[87];
 	sprintf(date, "%02d/%02d/%d %02d:%02d", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min);
-	SDL_Surface* TimeTextSurface = TTF_RenderText_Blended_Wrapped(FileList->ListFont, date, TextColour, Width);
+	SDL_Surface* TimeTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, date, TextColour, Width);
 	SDL_Texture* TimeTextTexture = SDL_CreateTextureFromSurface(Renderer, TimeTextSurface);
 	SDL_Rect TimeRect = {Width - TimeTextSurface->w, (HeaderHeight - TimeTextSurface->h) / 2, TimeTextSurface->w, TimeTextSurface->h};
 	SDL_RenderCopy(Renderer, TimeTextTexture, NULL, &TimeRect);
@@ -173,12 +175,22 @@ void ExplorerUI::DrawFooter()
 	//Vars for the text
 	SDL_Color TextColour = {255, 255, 255};
 	//Draw the path
-	SDL_Surface* PathTextSurface = TTF_RenderText_Blended_Wrapped(FileList->ListFont, DirPath.c_str(), TextColour, Width);
+	SDL_Surface* PathTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, DirPath.c_str(), TextColour, Width);
 	SDL_Texture* PathTextTexture = SDL_CreateTextureFromSurface(Renderer, PathTextSurface);
 	SDL_Rect PathRect = {0, (Height - FooterHeight) + (FooterHeight - PathTextSurface->h) / 2, PathTextSurface->w, PathTextSurface->h};
 	SDL_RenderCopy(Renderer, PathTextTexture, NULL, &PathRect);
 	SDL_DestroyTexture(PathTextTexture);
 	SDL_FreeSurface(PathTextSurface);
+	//Draw the control info
+	//Needs to use ext font
+	/*
+	SDL_Surface* ButtonTextSurface = TTF_RenderUTF8_Blended_Wrapped(FileList->ListFont, "\uE000 Open | \uE001 Back | \uE0EB Up | \uE0EC Down", TextColour, Width);
+	SDL_Texture* ButtonTextTexture = SDL_CreateTextureFromSurface(Renderer, ButtonTextSurface);
+	SDL_Rect ButtonTextRect = {Width - ButtonTextSurface->w, (Height - FooterHeight) + (FooterHeight - ButtonTextSurface->h) / 2, ButtonTextSurface->w, ButtonTextSurface->h};
+	if(PathRect.x + PathRect.w < Width - ButtonTextSurface->w) SDL_RenderCopy(Renderer, ButtonTextTexture, NULL, &ButtonTextRect);
+	SDL_DestroyTexture(ButtonTextTexture);
+	SDL_FreeSurface(ButtonTextSurface);
+	*/
 }
 
 void ExplorerUI::OpenFile(string Path)

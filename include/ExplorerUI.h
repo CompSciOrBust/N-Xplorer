@@ -1,13 +1,15 @@
 #include <SDL.h>
 #include <UI.h>
 #include <dirent.h>
-	
+#include <SDL2/SDL_ttf.h>
+
 class ExplorerUI : public UIWindow
 {
 	private:
 	//vars
-	int HeaderHeight = 50;
+	int HeaderHeight = 55;
 	int FooterHeight = 50;
+	TTF_Font *HeaderFooterFont;
 	public:
 	//vars
 	ScrollList *FileList;

@@ -152,3 +152,10 @@ TTF_Font *GetSharedFont(int FontSize)
 	plGetSharedFontByType(&standardFontData, PlSharedFontType_Standard);
 	return TTF_OpenFontRW(SDL_RWFromMem(standardFontData.address, standardFontData.size), 1, FontSize);
 }
+
+TTF_Font *GetSharedFontExt(int FontSize)
+{
+	PlFontData standardFontData;
+	plGetSharedFontByType(&standardFontData, PlSharedFontType_NintendoExt );
+	return TTF_OpenFontRW(SDL_RWFromMem(standardFontData.address, standardFontData.size), 1, FontSize);
+}

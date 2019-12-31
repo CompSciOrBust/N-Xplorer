@@ -48,3 +48,4 @@ class ScrollList
 
 bool CheckButtonPressed(SDL_Rect*, int, int);
 TTF_Font *GetSharedFont(int FontSize);
+TTF_Font *GetSharedFontExt(int FontSize);
