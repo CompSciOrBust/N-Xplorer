@@ -15,14 +15,17 @@ class ScrollList
 	int ListHeight = 0;
 	int ListWidth = 0;
 	int SelectedIndex = 0;
+	int CursorIndex = 0;
+	int ListRenderOffset = 0;
+	int *PSelectedIndex = NULL;
+	int *PCursorIndex = NULL;
+	int *PListRenderOffset = NULL;
 	int ListColour_R = 66;
 	int ListColour_G = 66;
 	int ListColour_B = 66;
 	int ListColourSelected_R = 161;
 	int ListColourSelected_G = 161;
 	int ListColourSelected_B = 161;
-	int CursorIndex = 0;
-	int ListRenderOffset = 0;
 	int ListingsOnScreen = 0;
 	int *TouchListX = NULL;
 	int *TouchListY = NULL;
@@ -34,7 +37,23 @@ class ScrollList
 	bool ItemSelected = false;
 	bool IsActive = false;
 	bool CenterText = false;
+	ScrollList();
+	void Enslave(ScrollList*);
 };
+
+ScrollList::ScrollList()
+{
+	PSelectedIndex = &SelectedIndex;
+	PCursorIndex = &CursorIndex;
+	PListRenderOffset = &ListRenderOffset;
+}
+
+void ScrollList::Enslave(ScrollList* Master)
+{
+	PSelectedIndex = Master->PSelectedIndex;
+	PCursorIndex = Master->PCursorIndex;
+	PListRenderOffset = Master->PListRenderOffset;
+}
 
 bool CheckButtonPressed(SDL_Rect* ButtonRect, int TouchX, int TouchY)
 {
@@ -50,35 +69,35 @@ void ScrollList::DrawList()
 	if(ListLength > ListingTextVec.size()) ListLength = ListingTextVec.size();
 	
 	//Check cursor is with in bounds
-	if(CursorIndex > ListLength-1)
+	if(*PCursorIndex > ListLength-1)
 	{
 		CursorIndex = ListLength-1;
 		ListRenderOffset++;
 	}
-	if(CursorIndex < 0)
+	if(*PCursorIndex < 0)
 	{
 		CursorIndex = 0;
 		ListRenderOffset--;
 	}
 	
 	//Check selected index is with in the bounds
-	if(SelectedIndex < 0)
+	if(*PSelectedIndex < 0)
 	{
-		SelectedIndex = ListingTextVec.size()-1;
-		CursorIndex = ListLength;
+		*PSelectedIndex = ListingTextVec.size()-1;
+		*PCursorIndex = ListLength;
 		ListRenderOffset = ListingTextVec.size() - ListLength-1;
 		//Don't crash if we scroll up and don't have enough items in the list to show
 		if(ListRenderOffset < 0)
 		{
-			SelectedIndex = ListingTextVec.size()-1;
-			CursorIndex = ListingTextVec.size()-1;
+			*PSelectedIndex = ListingTextVec.size()-1;
+			*PCursorIndex = ListingTextVec.size()-1;
 			ListRenderOffset = 0;
 		}
 	}
-	else if(SelectedIndex > ListingTextVec.size()-1)
+	else if(*PSelectedIndex > ListingTextVec.size()-1)
 	{
-		SelectedIndex = 0;
-		CursorIndex = 0;
+		*PSelectedIndex = 0;
+		*PCursorIndex = 0;
 		ListRenderOffset = 0;
 	}
 	
@@ -89,7 +108,7 @@ void ScrollList::DrawList()
 		if(IsActive) SDL_SetRenderDrawColor(Renderer, ListColour_R, ListColour_G, ListColour_B, 255);
 		else SDL_SetRenderDrawColor(Renderer, 96, 204, 204, 255);
 		//Check if this is the highlighted file
-		if(i == CursorIndex && IsActive)
+		if(i == *PCursorIndex && IsActive)
 		{
 			SDL_SetRenderDrawColor(Renderer, ListColourSelected_R, ListColourSelected_G, ListColourSelected_B, 255);
 			//Cyan 50
@@ -102,7 +121,7 @@ void ScrollList::DrawList()
 		
 		//Draw file names
 		SDL_Color TextColour = {255, 255, 255};
-		SDL_Surface* FileNameSurface = TTF_RenderUTF8_Blended_Wrapped(ListFont, ListingTextVec.at(i + ListRenderOffset).c_str(), TextColour, ListWidth);
+		SDL_Surface* FileNameSurface = TTF_RenderUTF8_Blended_Wrapped(ListFont, ListingTextVec.at(i + *PListRenderOffset).c_str(), TextColour, ListWidth);
 		SDL_Texture* FileNameTexture = SDL_CreateTextureFromSurface(Renderer, FileNameSurface);
 		//Calculate text X and Y Coords
 		int TextY = MenuItem.y + ((MenuItem.h - FileNameSurface->h) / 2);
@@ -133,9 +152,9 @@ void ScrollList::DrawList()
 		//Check if option is pressed
 		if(CheckButtonPressed(&MenuItem, *TouchListX, *TouchListY))
 		{
-			int SelectedDifference = i - CursorIndex;
+			int SelectedDifference = i - *PCursorIndex;
 			SelectedIndex += SelectedDifference;
-			CursorIndex = i;
+			*PCursorIndex = i;
 			ItemSelected = true;
 		}*/
 	

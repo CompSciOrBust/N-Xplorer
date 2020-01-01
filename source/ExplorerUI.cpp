@@ -19,7 +19,8 @@ class ExplorerUI : public UIWindow
 	TTF_Font *HeaderFooterFont;
 	public:
 	//vars
-	ScrollList *FileList;
+	ScrollList *FileNameList;
+	ScrollList *FileSizeList;
 	vector <dirent> Files = vector <dirent>(0);
 	string HighlightedPath = "";
 	string *ChosenFile;
@@ -39,18 +40,32 @@ ExplorerUI::ExplorerUI()
 	//Set up shared font
 	PlFontData standardFontData;
 	plGetSharedFontByType(&standardFontData, PlSharedFontType_Standard);
-	//Get a list of the files
-	FileList = new ScrollList();
-	//Set up the file list
-	//FileList->TouchListX = &TouchX;
-	//FileList->TouchListY = &TouchY;
-	FileList->ListFont = GetSharedFont(30); //Load the list font
-	FileList->ListingsOnScreen = 15;
-	FileList->ListHeight = Height - HeaderHeight - FooterHeight;
-	FileList->ListWidth = Width;
-	FileList->ListYOffset = HeaderHeight;
-	FileList->IsActive = true;
-	//Populate list
+	
+	//Set up the file lists
+	//File name
+	FileNameList = new ScrollList();
+	//FileNameList->TouchListX = &TouchX;
+	//FileNameList->TouchListY = &TouchY;
+	FileNameList->ListFont = GetSharedFont(30); //Load the list font
+	FileNameList->ListingsOnScreen = 15;
+	FileNameList->ListHeight = Height - HeaderHeight - FooterHeight;
+	FileNameList->ListWidth = Width * 0.85;
+	FileNameList->ListYOffset = HeaderHeight;
+	FileNameList->IsActive = true;
+	//File size
+	FileSizeList = new ScrollList();
+	//FileSizeList->TouchListX = &TouchX;
+	//FileSizeList->TouchListY = &TouchY;
+	FileSizeList->Enslave(FileNameList);
+	FileSizeList->ListFont = FileNameList->ListFont;
+	FileSizeList->ListingsOnScreen = 15;
+	FileSizeList->ListHeight = Height - HeaderHeight - FooterHeight;
+	FileSizeList->ListWidth = Width * 0.15;
+	FileSizeList->ListYOffset = HeaderHeight;
+	FileSizeList->ListXOffset = FileNameList->ListWidth;
+	FileSizeList->CenterText = true;
+	FileSizeList->IsActive = true;
+	//Populate lists
 	LoadListDirs(DirPath);
 	HeaderFooterFont = GetSharedFont(40);
 }
@@ -71,9 +86,9 @@ void ExplorerUI::GetInput()
 					  if(Event->jbutton.button == 10 || Event->jbutton.button == 3)
 					  {
 						  //Update highlighted file if one exists
-						  if(!FileList->ListingTextVec.empty())
+						  if(!FileNameList->ListingTextVec.empty())
 						  {
-							  HighlightedPath = DirPath + Files.at(FileList->SelectedIndex).d_name;
+							  HighlightedPath = DirPath + Files.at(FileNameList->SelectedIndex).d_name;
 						  }
 						  else
 						  {
@@ -84,20 +99,20 @@ void ExplorerUI::GetInput()
 					  //Up pressed
 					  else if(Event->jbutton.button == 13)
 					  {
-						  FileList->CursorIndex--;
-						  FileList->SelectedIndex--;
+						  FileNameList->CursorIndex--;
+						  FileNameList->SelectedIndex--;
 					  }
 					  //Down pressed
 					  else if(Event->jbutton.button == 15)
 					  {
-						  FileList->CursorIndex++;
-						  FileList->SelectedIndex++;
+						  FileNameList->CursorIndex++;
+						  FileNameList->SelectedIndex++;
 					  }
 					  //A pressed
 					  else if(Event->jbutton.button == 0)
 					  {
 						  //Check if directory. If not open file.
-						  string FilePath = DirPath + Files.at(FileList->SelectedIndex).d_name;
+						  string FilePath = DirPath + Files.at(FileNameList->SelectedIndex).d_name;
 						  if(CheckIsDir(FilePath))
 						  {
 								DirPath = FilePath + "/";
@@ -105,7 +120,7 @@ void ExplorerUI::GetInput()
 						  }
 						  else
 						  {
-								OpenFile(DirPath + Files.at(FileList->SelectedIndex).d_name);
+								OpenFile(DirPath + Files.at(FileNameList->SelectedIndex).d_name);
 						  }
 					  }
 					  //B pressed
@@ -114,8 +129,8 @@ void ExplorerUI::GetInput()
 						  DirPath = GoUpDir(DirPath) + "/";
 						  LoadListDirs(DirPath);
 						  //Reset the cursor
-						  FileList->SelectedIndex = 0;
-						  FileList->CursorIndex = 0;
+						  FileNameList->SelectedIndex = 0;
+						  FileNameList->CursorIndex = 0;
 					  }
 				  }
 			  }
@@ -134,8 +149,9 @@ void ExplorerUI::DrawUI()
 	DrawHeader();
 	//Draw the footer
 	DrawFooter();
-	//Draw the list
-	FileList->DrawList();
+	//Draw the lists
+	FileNameList->DrawList();
+	FileSizeList->DrawList();
 }
 
 void ExplorerUI::DrawHeader()
@@ -184,7 +200,7 @@ void ExplorerUI::DrawFooter()
 	//Draw the control info
 	//Needs to use ext font
 	/*
-	SDL_Surface* ButtonTextSurface = TTF_RenderUTF8_Blended_Wrapped(FileList->ListFont, "\uE000 Open | \uE001 Back | \uE0EB Up | \uE0EC Down", TextColour, Width);
+	SDL_Surface* ButtonTextSurface = TTF_RenderUTF8_Blended_Wrapped(FileNameList->ListFont, "\uE000 Open | \uE001 Back | \uE0EB Up | \uE0EC Down", TextColour, Width);
 	SDL_Texture* ButtonTextTexture = SDL_CreateTextureFromSurface(Renderer, ButtonTextSurface);
 	SDL_Rect ButtonTextRect = {Width - ButtonTextSurface->w, (Height - FooterHeight) + (FooterHeight - ButtonTextSurface->h) / 2, ButtonTextSurface->w, ButtonTextSurface->h};
 	if(PathRect.x + PathRect.w < Width - ButtonTextSurface->w) SDL_RenderCopy(Renderer, ButtonTextTexture, NULL, &ButtonTextRect);
@@ -217,11 +233,13 @@ void ExplorerUI::OpenFile(string Path)
 
 void ExplorerUI::LoadListDirs(string DirPath)
 {
-	FileList->ListingTextVec.clear();
+	FileNameList->ListingTextVec.clear();
+	FileSizeList->ListingTextVec.clear();
 	Files = LoadDirs(DirPath);
 	for(int i = 0; i < Files.size(); i++)
 	{
-		FileList->ListingTextVec.push_back(Files.at(i).d_name);
+		FileNameList->ListingTextVec.push_back(Files.at(i).d_name);
+		FileSizeList->ListingTextVec.push_back(GetFileSize(DirPath + "/" + Files.at(i).d_name));
 	}
 }
 
@@ -312,10 +330,10 @@ void MenuUI::GetInput()
 							case 0:
 							{
 								//Only copy the file if the file exists
-								if(!Explorer->FileList->ListingTextVec.empty())
+								if(!Explorer->FileNameList->ListingTextVec.empty())
 								{
 									ClipboardPath = Explorer->HighlightedPath.c_str();
-									ClipboardFileName = Explorer->FileList->ListingTextVec.at(Explorer->FileList->SelectedIndex);
+									ClipboardFileName = Explorer->FileNameList->ListingTextVec.at(Explorer->FileNameList->SelectedIndex);
 								}
 							}
 							break;
@@ -336,9 +354,9 @@ void MenuUI::GetInput()
 							case 3:
 							{
 								//Make sure the dir isn't empty
-								if(!Explorer->FileList->ListingTextVec.empty())
+								if(!Explorer->FileNameList->ListingTextVec.empty())
 								{
-								  	string ExistingFileName = Explorer->FileList->ListingTextVec.at(Explorer->FileList->SelectedIndex);
+								  	string ExistingFileName = Explorer->FileNameList->ListingTextVec.at(Explorer->FileNameList->SelectedIndex);
 									string NewFileName = Explorer->DirPath + GetKeyboardInput("Rename", "Rename " + ExistingFileName, ExistingFileName);
 									rename(Explorer->HighlightedPath.c_str(), NewFileName.c_str());
 								}

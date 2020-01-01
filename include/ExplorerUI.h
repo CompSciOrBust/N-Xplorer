@@ -12,7 +12,8 @@ class ExplorerUI : public UIWindow
 	TTF_Font *HeaderFooterFont;
 	public:
 	//vars
-	ScrollList *FileList;
+	ScrollList *FileNameList;
+	ScrollList *FileSizeList;
 	vector <dirent> Files = vector <dirent>(0);
 	string HighlightedPath = "";
 	string *ChosenFile;

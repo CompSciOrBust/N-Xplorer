@@ -69,7 +69,8 @@ int main(int argc, char* argv[])
 	Explorer->IsDone = &Done;
 	Explorer->Event = &Event;
 	Explorer->WindowState = &WindowState;
-	Explorer->FileList->Renderer = Renderer;
+	Explorer->FileNameList->Renderer = Renderer;
+	Explorer->FileSizeList->Renderer = Renderer;
 	Explorer->ChosenFile = &ChosenFile;
 	
 	//Init context menu

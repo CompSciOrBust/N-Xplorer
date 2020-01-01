@@ -25,14 +25,17 @@ class ScrollList
 	int ListHeight = 0;
 	int ListWidth = 0;
 	int SelectedIndex = 0;
+	int CursorIndex = 0;
+	int ListRenderOffset = 0;
+	int *PSelectedIndex = NULL;
+	int *PCursorIndex = NULL;
+	int *PListRenderOffset = NULL;
 	int ListColour_R = 66;
 	int ListColour_G = 66;
 	int ListColour_B = 66;
 	int ListColourSelected_R = 161;
 	int ListColourSelected_G = 161;
 	int ListColourSelected_B = 161;
-	int CursorIndex = 0;
-	int ListRenderOffset = 0;
 	int ListingsOnScreen = 0;
 	int *TouchListX = NULL;
 	int *TouchListY = NULL;
@@ -44,8 +47,9 @@ class ScrollList
 	bool ItemSelected = false;
 	bool IsActive = false;
 	bool CenterText = false;
+	ScrollList();
+	void Enslave(ScrollList*);
 };
 
 bool CheckButtonPressed(SDL_Rect*, int, int);
 TTF_Font *GetSharedFont(int FontSize);
-TTF_Font *GetSharedFontExt(int FontSize);

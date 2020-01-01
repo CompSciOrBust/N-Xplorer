@@ -9,3 +9,4 @@ string GoUpDir(string);
 bool CheckIsDir(string Path);
 bool CheckFileExists(string);
 string GetKeyboardInput(string, string, string);
+string GetFileSize(string);

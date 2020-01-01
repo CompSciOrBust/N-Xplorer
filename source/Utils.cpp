@@ -64,3 +64,15 @@ string GetKeyboardInput(string OkButtonText, string GuideText, string InitialTex
 	swkbdShow(&kbd, tmpoutstr, sizeof(tmpoutstr));
 	return tmpoutstr;
 }
+
+//tolen from https://stackoverflow.com/a/6039648
+string GetFileSize(string Path)
+{
+	if(CheckIsDir(Path)) return "DIR";
+	struct stat stat_buf;
+    stat(Path.c_str(), &stat_buf);
+	if(stat_buf.st_size > 1073741824) return to_string(stat_buf.st_size / 1073741824) + " GB";
+	else if(stat_buf.st_size > 1048576) return to_string(stat_buf.st_size / 1048576) + " MB";
+	else if(stat_buf.st_size > 1024) return to_string(stat_buf.st_size / 1024) + " KB";
+	else return to_string(stat_buf.st_size) + " B";
+}
