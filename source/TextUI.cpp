@@ -2,6 +2,7 @@
 #include <UI.h>
 #include <fstream>
 #include <iostream>
+#include <utils.h>
 using namespace std;
 
 class TextUI : public UIWindow
@@ -24,6 +25,7 @@ class TextUI : public UIWindow
 	void GetInput();
 	void DrawUI();
 	void LoadFile();
+	void SaveFile();
 };
 
 TextUI::TextUI()
@@ -68,11 +70,53 @@ void TextUI::GetInput()
 				//B pressed
 				else if(Event->jbutton.button == 1)
 				{
+					SaveFile();
 					*WindowState = 0;
+				}
+				//left pressed
+				else if(Event->jbutton.button == 12)
+				{
+					LinesVec.erase(LinesVec.begin() + SelectedLine);
+				}
+				//right pressed
+				else if(Event->jbutton.button == 14)
+				{
+					LinesVec.insert(LinesVec.begin() + SelectedLine+1, "");
+				}
+				//A pressed
+				else if(Event->jbutton.button == 0)
+				{
+					string EditedLine = GetKeyboardInput("Done", "Edit line", LinesVec.at(SelectedLine));
+					LinesVec.at(SelectedLine) = EditedLine;
 				}
 			}
 		}
 	}
+}
+
+//Save the file
+void TextUI::SaveFile()
+{
+	//Create a output stream
+	ofstream FileWriter(ChosenFile->c_str());
+	//If we are able to write to the file delete the existing file
+	if(FileWriter)
+	{
+		remove(ChosenFile->c_str());
+	}
+	//Write the new edited file
+	for(int i = 0; i < LinesVec.size(); i++)
+	{
+		FileWriter << LinesVec.at(i);
+		//If not the last line add a new line character
+		if(LinesVec.size() != i+1)
+		{
+			FileWriter << endl;
+		}
+	}
+	//Close the stream
+	FileWriter.close();
+	*this->WindowState = 0;
 }
 
 //This function was largely taken unaltered from before the rewrite

@@ -21,4 +21,5 @@ class TextUI : public UIWindow
 	void GetInput();
 	void DrawUI();
 	void LoadFile();
+	void SaveFile();
 };

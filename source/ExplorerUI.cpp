@@ -142,7 +142,7 @@ void ExplorerUI::GetInput()
 void ExplorerUI::DrawUI()
 {
 	//Draw the BG
-	SDL_SetRenderDrawColor(Renderer, 255, 255, 255, 255);
+	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
 	SDL_Rect BGRect = {0,0, Width, Height};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the header
@@ -163,7 +163,7 @@ void ExplorerUI::DrawHeader()
 	//Vars for the text
 	SDL_Color TextColour = {255, 255, 255};
 	//Draw the title
-	SDL_Surface* TitleTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, "N-Xplorer", TextColour, Width);
+	SDL_Surface* TitleTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, " N-Xplorer", TextColour, Width);
 	SDL_Texture* TitleTextTexture = SDL_CreateTextureFromSurface(Renderer, TitleTextSurface);
 	SDL_Rect TitleRect = {0, (HeaderHeight - TitleTextSurface->h) / 2, TitleTextSurface->w, TitleTextSurface->h};
 	SDL_RenderCopy(Renderer, TitleTextTexture, NULL, &TitleRect);
@@ -173,7 +173,7 @@ void ExplorerUI::DrawHeader()
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
 	char date[87];
-	sprintf(date, "%02d/%02d/%d %02d:%02d", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min);
+	sprintf(date, "%02d/%02d/%d %02d:%02d ", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min);
 	SDL_Surface* TimeTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, date, TextColour, Width);
 	SDL_Texture* TimeTextTexture = SDL_CreateTextureFromSurface(Renderer, TimeTextSurface);
 	SDL_Rect TimeRect = {Width - TimeTextSurface->w, (HeaderHeight - TimeTextSurface->h) / 2, TimeTextSurface->w, TimeTextSurface->h};
@@ -365,14 +365,14 @@ void MenuUI::GetInput()
 							//New dir
 							case 4:
 							{
-								string NewDirName = Explorer->DirPath + GetKeyboardInput("New folder", "Enter folder name", "New Folder");
+								string NewDirName = Explorer->DirPath + GetKeyboardInput("Done", "Enter folder name", "New Folder");
 								mkdir(NewDirName.c_str(), 0);
 							}
 							break;
 							//New file
 							case 5:
 							{
-								string NewFileName = Explorer->DirPath + GetKeyboardInput("New file", "Enter file name", "New File");
+								string NewFileName = Explorer->DirPath + GetKeyboardInput("Done", "Enter file name", "New File");
 								if(!CheckFileExists(NewFileName))
 								{
 									ofstream outfile (NewFileName.c_str());

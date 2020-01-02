@@ -142,7 +142,7 @@ void ScrollList::DrawList()
 		SDL_Rect BorderRect = {ListXOffset, ListYOffset + (i * ListingHeight) - 1, ListWidth, BorderSize};
 		SDL_RenderFillRect(Renderer, &BorderRect);
 		//Check if we need to draw one more border
-		if(ListLength < ListingsOnScreen && i == ListLength - 1)
+		if(i == ListLength - 1)
 		{
 			BorderRect = {ListXOffset, ListYOffset + (++i * ListingHeight) - 1, ListWidth, BorderSize};
 			SDL_RenderFillRect(Renderer, &BorderRect);
