@@ -6,6 +6,7 @@
 #include <switch.h>
 #include <ExplorerUI.h>
 #include <TextUI.h>
+#include <ImageUI.h>
 using namespace std;
 
 // Main program entrypoint
@@ -89,6 +90,14 @@ int main(int argc, char* argv[])
 	TextEditor->Event = &Event;
 	TextEditor->WindowState = &WindowState;
 	TextEditor->ChosenFile = &ChosenFile;
+	
+	//Init the image viewer
+	ImageUI *ImageViewer = new ImageUI();
+	ImageViewer->Renderer = Renderer;
+	ImageViewer->Event = &Event;
+	ImageViewer->WindowState = &WindowState;
+	ImageViewer->ChosenFile = &ChosenFile;
+	
 	//Main loop
 	while(!Done)
 	{
@@ -103,6 +112,7 @@ int main(int argc, char* argv[])
 				Explorer->DrawUI();
 				//If switched to the text editor we need to load the file
 				if(WindowState == 2) TextEditor->LoadFile();
+				else if (WindowState == 3) ImageViewer->LoadFile();
 			}
 			break;
 			//Draw the menu
@@ -120,8 +130,12 @@ int main(int argc, char* argv[])
 				TextEditor->DrawUI();
 			}
 			break;
-			//Draw he image viewer
+			//Draw the image viewer
 			case 3:
+			{
+				ImageViewer->GetInput();
+				ImageViewer->DrawUI();
+			}
 			break;
 		}
 		//Draw the frame
