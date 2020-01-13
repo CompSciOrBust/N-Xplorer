@@ -2,11 +2,11 @@
 #include <vector>
 #include <stdio.h>
 #include <dirent.h>
-using namespace std;
 
-vector <dirent> LoadDirs(string Path);
-string GoUpDir(string);
-bool CheckIsDir(string Path);
-bool CheckFileExists(string);
-string GetKeyboardInput(string, string, string);
-string GetFileSize(string);
+vector <dirent> LoadDirs(std::string Path);
+std::string GoUpDir(std::string);
+bool CheckIsDir(std::string Path);
+bool CheckFileExists(std::string);
+std::string GetKeyboardInput(std::string, std::string, std::string);
+std::string GetFileSize(std::string);
+void RecursiveFileCopy(std::string, std::string, std::string);

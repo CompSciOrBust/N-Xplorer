@@ -198,15 +198,14 @@ void ExplorerUI::DrawFooter()
 	SDL_DestroyTexture(PathTextTexture);
 	SDL_FreeSurface(PathTextSurface);
 	//Draw the control info
-	//Needs to use ext font
-	/*
-	SDL_Surface* ButtonTextSurface = TTF_RenderUTF8_Blended_Wrapped(FileNameList->ListFont, "\uE000 Open | \uE001 Back | \uE0EB Up | \uE0EC Down", TextColour, Width);
+	//Needs to use ext font for glyths
+	//SDL_Surface* ButtonTextSurface = TTF_RenderUTF8_Blended_Wrapped(FileNameList->ListFont, "\uE000 Open | \uE001 Back | \uE0EB Up | \uE0EC Down", TextColour, Width);
+	SDL_Surface* ButtonTextSurface = TTF_RenderUTF8_Blended_Wrapped(FileNameList->ListFont, "A Open | B Back | ▲ Up | ▼ Down ", TextColour, Width);
 	SDL_Texture* ButtonTextTexture = SDL_CreateTextureFromSurface(Renderer, ButtonTextSurface);
 	SDL_Rect ButtonTextRect = {Width - ButtonTextSurface->w, (Height - FooterHeight) + (FooterHeight - ButtonTextSurface->h) / 2, ButtonTextSurface->w, ButtonTextSurface->h};
 	if(PathRect.x + PathRect.w < Width - ButtonTextSurface->w) SDL_RenderCopy(Renderer, ButtonTextTexture, NULL, &ButtonTextRect);
 	SDL_DestroyTexture(ButtonTextTexture);
 	SDL_FreeSurface(ButtonTextSurface);
-	*/
 }
 
 void ExplorerUI::OpenFile(string Path)
@@ -219,14 +218,15 @@ void ExplorerUI::OpenFile(string Path)
 		*WindowState = 3;
 		*ChosenFile = Path;
 	}
-	else if(FileSuffix == "mp3" || FileSuffix == "wav")
-	{
-		*WindowState = 4;
-		*ChosenFile = Path;
-	}
 	else if(FileSuffix == "txt" || FileSuffix == "ini" || FileSuffix == "json" || FileSuffix == "plist" || FileSuffix == "cfg" || FileSuffix == "log")
 	{
 		*WindowState = 2;
+		*ChosenFile = Path;
+	}
+	//This should be done as a seperate sysmodule
+	else if(FileSuffix == "mp3" || FileSuffix == "wav")
+	{
+		//*WindowState = 4;
 		*ChosenFile = Path;
 	}
 }
@@ -340,7 +340,7 @@ void MenuUI::GetInput()
 							//paste
 							case 1:
 							{
-							  //Not implemented
+							  if(!ClipboardPath.empty()) RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
 							}
 							break;
 							//Move
