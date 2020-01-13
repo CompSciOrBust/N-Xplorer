@@ -13,7 +13,6 @@ std::vector <dirent> LoadDirs(std::string Path)
 	DIR* dir;
 	struct dirent* ent;
 	dir = opendir(Path.c_str());
-	Files.clear();
 	while ((ent = readdir(dir)))
 	{
 		Files.push_back(*ent);

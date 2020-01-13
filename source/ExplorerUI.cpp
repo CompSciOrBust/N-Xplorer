@@ -117,6 +117,10 @@ void ExplorerUI::GetInput()
 						  {
 								DirPath = FilePath + "/";
 								LoadListDirs(DirPath);
+								//Reset the cursor
+								FileNameList->SelectedIndex = 0;
+								FileNameList->CursorIndex = 0;
+								FileNameList->ListRenderOffset = 0; //Reminder to future self. Reset this var or fatals will occur of which crash report won't help debug.
 						  }
 						  else
 						  {
@@ -131,6 +135,7 @@ void ExplorerUI::GetInput()
 						  //Reset the cursor
 						  FileNameList->SelectedIndex = 0;
 						  FileNameList->CursorIndex = 0;
+						  FileNameList->ListRenderOffset = 0;
 					  }
 				  }
 			  }
@@ -233,9 +238,9 @@ void ExplorerUI::OpenFile(string Path)
 
 void ExplorerUI::LoadListDirs(string DirPath)
 {
+	Files = LoadDirs(DirPath);
 	FileNameList->ListingTextVec.clear();
 	FileSizeList->ListingTextVec.clear();
-	Files = LoadDirs(DirPath);
 	for(int i = 0; i < Files.size(); i++)
 	{
 		FileNameList->ListingTextVec.push_back(Files.at(i).d_name);
