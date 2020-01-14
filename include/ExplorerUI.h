@@ -2,6 +2,7 @@
 #include <UI.h>
 #include <dirent.h>
 #include <SDL2/SDL_ttf.h>
+#include <thread>
 
 class ExplorerUI : public UIWindow
 {
@@ -32,8 +33,12 @@ class MenuUI : public UIWindow
 {
 	private:
 	//vars
-	string ClipboardPath = "";
-	string ClipboardFileName = "";
+	std::string ClipboardPath = "";
+	std::string ClipboardFileName = "";
+	std::string LongOpMessage = "";
+	std::thread LongOpThread;
+	//functions
+	void RecFileCopy();
 	public:
 	//vars
 	ScrollList *MenuList;
@@ -42,4 +47,5 @@ class MenuUI : public UIWindow
 	MenuUI();
 	void GetInput();
 	void DrawUI();
+	void DrawLongOpMessage();
 };

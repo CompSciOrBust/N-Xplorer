@@ -137,6 +137,13 @@ int main(int argc, char* argv[])
 				ImageViewer->DrawUI();
 			}
 			break;
+			//Long opperation display window
+			case 4:
+			{
+				Explorer->DrawUI();
+				Menu->DrawLongOpMessage();
+			}
+			break;
 		}
 		//Draw the frame
         SDL_RenderPresent(Renderer);

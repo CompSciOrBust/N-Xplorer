@@ -8,6 +8,7 @@
 #include <fstream>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
+#include <thread>
 using namespace std;
 
 class ExplorerUI : public UIWindow
@@ -252,8 +253,12 @@ class MenuUI : public UIWindow
 {
 	private:
 	//vars
-	string ClipboardPath = "";
-	string ClipboardFileName = "";
+	std::string ClipboardPath = "";
+	std::string ClipboardFileName = "";
+	std::string LongOpMessage = "";
+	std::thread LongOpThread;
+	//functions
+	void RecFileCopy();
 	public:
 	//vars
 	ScrollList *MenuList;
@@ -262,6 +267,7 @@ class MenuUI : public UIWindow
 	MenuUI();
 	void GetInput();
 	void DrawUI();
+	void DrawLongOpMessage();
 };
 
 MenuUI::MenuUI()
@@ -297,8 +303,42 @@ void MenuUI::DrawUI()
 	MenuList->DrawList();
 }
 
+//Draw the long op message
+void MenuUI::DrawLongOpMessage()
+{
+	//Draw the outline
+	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	int BGWidth = Width * 0.7;
+	int BGHeight = Height * 0.5;
+	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight};
+	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the BG foreground (yes that is ironic)
+	BGWidth -= 4;
+	BGHeight -= 4;
+	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight};
+	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the message text
+	SDL_Color TextColour = {255, 255, 255};
+	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(MenuList->ListFont, LongOpMessage.c_str(), TextColour, BGWidth);
+	SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
+	SDL_Rect MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, BGRect.y + (BGHeight - MessageTextSurface->h) / 2, MessageTextSurface->w, MessageTextSurface->h};
+	SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
+	SDL_DestroyTexture(MessageTextTexture);
+	SDL_FreeSurface(MessageTextSurface);
+}
+
+//Seperate function for recursive file copy needed for threading
+void MenuUI::RecFileCopy()
+{
+	RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
+	Explorer->LoadListDirs(Explorer->DirPath);
+	*WindowState = 0;
+}
+
 void MenuUI::GetInput()
 {
+	if(LongOpThread.joinable()) LongOpThread.join();
 	//ScanInput
 	while (SDL_PollEvent(Event))
 	{
@@ -345,7 +385,13 @@ void MenuUI::GetInput()
 							//paste
 							case 1:
 							{
-							  if(!ClipboardPath.empty()) RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
+								if(!ClipboardPath.empty())
+								{
+									LongOpThread = std::thread(&MenuUI::RecFileCopy, this);
+									*WindowState = 4;
+									LongOpMessage = "Copying " + ClipboardFileName + ". This may take some time.";
+								}
+							  //if(!ClipboardPath.empty()) RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
 							}
 							break;
 							//Move
@@ -412,7 +458,7 @@ void MenuUI::GetInput()
 						  break;
 						}
 						//Return to explorer and reload the dir list
-						*WindowState = 0;
+						if(*WindowState !=4 ) *WindowState = 0;
 						Explorer->LoadListDirs(Explorer->DirPath);
 					  }
 				  }
