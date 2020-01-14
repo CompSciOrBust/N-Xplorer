@@ -353,6 +353,7 @@ void MenuUI::GetInput()
 							{
 								string PathToMoveTo = Explorer->DirPath + ClipboardFileName;
 								rename(ClipboardPath.c_str(), PathToMoveTo.c_str());
+								ClipboardPath = PathToMoveTo;
 							}
 							break;
 							//Rename
