@@ -148,7 +148,7 @@ void ExplorerUI::GetInput()
 void ExplorerUI::DrawUI()
 {
 	//Draw the BG
-	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_SetRenderDrawColor(Renderer, 44, 44, 44, 255);
 	SDL_Rect BGRect = {0,0, Width, Height};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the header
@@ -186,6 +186,10 @@ void ExplorerUI::DrawHeader()
 	SDL_RenderCopy(Renderer, TimeTextTexture, NULL, &TimeRect);
 	SDL_DestroyTexture(TimeTextTexture);
 	SDL_FreeSurface(TimeTextSurface);
+	//Draw separator
+	SDL_Rect BorderRect = {0, HeaderHeight, Width, 3};
+	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(Renderer, &BorderRect);
 }
 
 void ExplorerUI::DrawFooter()
@@ -212,6 +216,10 @@ void ExplorerUI::DrawFooter()
 	if(PathRect.x + PathRect.w < Width - ButtonTextSurface->w) SDL_RenderCopy(Renderer, ButtonTextTexture, NULL, &ButtonTextRect);
 	SDL_DestroyTexture(ButtonTextTexture);
 	SDL_FreeSurface(ButtonTextSurface);
+	//Draw separator
+	SDL_Rect BorderRect = {0, Height - FooterHeight - 3, Width, 3};
+	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(Renderer, &BorderRect);
 }
 
 void ExplorerUI::OpenFile(string Path)
