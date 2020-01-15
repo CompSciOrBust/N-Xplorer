@@ -101,7 +101,7 @@ void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string
 		closedir(dir);
 	}
 	//If file just copy it
-	else
+	else if(CheckFileExists(SourcePath.c_str()))
 	{
 		//Stolen from https://stackoverflow.com/a/10195497 because <filesystem> is broken with the toolchain
 		std::string PathToCopyTo = DestPath + "/" + FileName;

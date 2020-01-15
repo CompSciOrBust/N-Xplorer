@@ -329,6 +329,7 @@ void MenuUI::DrawLongOpMessage()
 }
 
 //Seperate function for recursive file copy needed for threading
+//Should we do this as a lambda?
 void MenuUI::RecFileCopy()
 {
 	RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
