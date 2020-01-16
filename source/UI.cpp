@@ -101,6 +101,14 @@ void ScrollList::DrawList()
 		ListRenderOffset = 0;
 	}
 	
+	//Make sure we don't try to render a item that doesn't exist
+	while(ListingTextVec.size() > ListingsOnScreen && *PListRenderOffset + ListingsOnScreen > ListingTextVec.size())
+	{
+		*PListRenderOffset = 0;
+		*PCursorIndex = 0;
+		*PSelectedIndex = 0;
+	}
+	
 	//Draw the list
 	for(int i = 0; i < ListLength; i++)
 	{

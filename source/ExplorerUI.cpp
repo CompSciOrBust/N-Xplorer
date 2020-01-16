@@ -8,7 +8,7 @@
 #include <fstream>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
-#include <thread>
+#include <mutex>
 using namespace std;
 
 class ExplorerUI : public UIWindow
@@ -18,6 +18,7 @@ class ExplorerUI : public UIWindow
 	int HeaderHeight = 55;
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
+	std::mutex ListAccesMutex;
 	public:
 	//vars
 	ScrollList *FileNameList;
@@ -25,7 +26,7 @@ class ExplorerUI : public UIWindow
 	vector <dirent> Files = vector <dirent>(0);
 	string HighlightedPath = "";
 	string *ChosenFile;
-	string DirPath = "sdmc:/";
+	string DirPath = "sdmc://";
 	//functions
 	ExplorerUI();
 	void GetInput();
@@ -109,6 +110,16 @@ void ExplorerUI::GetInput()
 						  FileNameList->CursorIndex++;
 						  FileNameList->SelectedIndex++;
 					  }
+					  //Left pressed
+					  else if(Event->jbutton.button == 12)
+					  {
+						  //Todo fast move
+					  }
+					  //Right pressed
+					  else if(Event->jbutton.button == 14)
+					  {
+						  //Todo fast move
+					  }
 					  //A pressed
 					  else if(Event->jbutton.button == 0)
 					  {
@@ -156,8 +167,10 @@ void ExplorerUI::DrawUI()
 	//Draw the footer
 	DrawFooter();
 	//Draw the lists
+	ListAccesMutex.lock();
 	FileNameList->DrawList();
 	FileSizeList->DrawList();
+	ListAccesMutex.unlock();
 }
 
 void ExplorerUI::DrawHeader()
@@ -248,6 +261,7 @@ void ExplorerUI::OpenFile(string Path)
 void ExplorerUI::LoadListDirs(string DirPath)
 {
 	Files = LoadDirs(DirPath);
+	ListAccesMutex.lock();
 	FileNameList->ListingTextVec.clear();
 	FileSizeList->ListingTextVec.clear();
 	for(int i = 0; i < Files.size(); i++)
@@ -255,6 +269,7 @@ void ExplorerUI::LoadListDirs(string DirPath)
 		FileNameList->ListingTextVec.push_back(Files.at(i).d_name);
 		FileSizeList->ListingTextVec.push_back(GetFileSize(DirPath + "/" + Files.at(i).d_name));
 	}
+	ListAccesMutex.unlock();
 }
 
 class MenuUI : public UIWindow
@@ -264,7 +279,6 @@ class MenuUI : public UIWindow
 	std::string ClipboardPath = "";
 	std::string ClipboardFileName = "";
 	std::string LongOpMessage = "";
-	std::thread LongOpThread;
 	//functions
 	void RecFileCopy();
 	public:
@@ -341,13 +355,11 @@ void MenuUI::DrawLongOpMessage()
 void MenuUI::RecFileCopy()
 {
 	RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
-	Explorer->LoadListDirs(Explorer->DirPath);
 	*WindowState = 0;
 }
 
 void MenuUI::GetInput()
 {
-	if(LongOpThread.joinable()) LongOpThread.join();
 	//ScanInput
 	while (SDL_PollEvent(Event))
 	{
@@ -396,9 +408,9 @@ void MenuUI::GetInput()
 							{
 								if(!ClipboardPath.empty())
 								{
-									LongOpThread = std::thread(&MenuUI::RecFileCopy, this);
-									*WindowState = 4;
 									LongOpMessage = "Copying " + ClipboardFileName + ". This may take some time.";
+									*WindowState = 4;
+									RecFileCopy();
 								}
 							  //if(!ClipboardPath.empty()) RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
 							}
@@ -446,6 +458,8 @@ void MenuUI::GetInput()
 							{
 								//Don't nuke the /switch/ directory if the user presses delete in an empty dir
 								if(Explorer->HighlightedPath.empty()) break;
+								LongOpMessage = "Deleting " + Explorer->FileNameList->ListingTextVec.at(Explorer->FileNameList->SelectedIndex) + ". This may take some time.";
+								*WindowState = 4;
 								//Check if directory
 								if(CheckIsDir(Explorer->HighlightedPath.c_str()))
 								{
@@ -467,8 +481,8 @@ void MenuUI::GetInput()
 						  break;
 						}
 						//Return to explorer and reload the dir list
-						if(*WindowState !=4 ) *WindowState = 0;
 						Explorer->LoadListDirs(Explorer->DirPath);
+						*WindowState = 0;
 					  }
 				  }
 			  }

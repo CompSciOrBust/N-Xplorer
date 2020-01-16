@@ -7,7 +7,8 @@
 #include <ExplorerUI.h>
 #include <TextUI.h>
 #include <ImageUI.h>
-using namespace std;
+#include <thread>
+#include <mutex>
 
 // Main program entrypoint
 int main(int argc, char* argv[])
@@ -17,6 +18,8 @@ int main(int argc, char* argv[])
 	int Width = 1280;
 	int Height = 720;
 	int WindowState = 0;
+	int *WindowStatePtr = &WindowState;
+	int *DonePtr = &Done;
 	SDL_Window *Window;
 	SDL_Renderer *Renderer;
 	SDL_Event Event;
@@ -67,38 +70,98 @@ int main(int argc, char* argv[])
 	//Init explorer UI
 	ExplorerUI *Explorer = new ExplorerUI();
 	Explorer->Renderer = Renderer;
-	Explorer->IsDone = &Done;
+	Explorer->IsDone = DonePtr;
 	Explorer->Event = &Event;
-	Explorer->WindowState = &WindowState;
+	Explorer->WindowState = WindowStatePtr;
 	Explorer->FileNameList->Renderer = Renderer;
 	Explorer->FileSizeList->Renderer = Renderer;
 	Explorer->ChosenFile = &ChosenFile;
+	std::mutex ExplorerAccess;
+	std::mutex *ExplorerAccessPtr = &ExplorerAccess;
 	
 	//Init context menu
 	MenuUI *Menu = new MenuUI();
 	Menu->Renderer = Renderer;
-	Menu->IsDone = &Done;
+	Menu->IsDone = DonePtr;
 	Menu->Event = &Event;
-	Menu->WindowState = &WindowState;
+	Menu->WindowState = WindowStatePtr;
 	Menu->MenuList->Renderer = Renderer;
 	Menu->Explorer = Explorer;
 	
 	//Init text editor
 	TextUI *TextEditor = new TextUI();
 	TextEditor->Renderer = Renderer;
-	TextEditor->IsDone = &Done;
+	TextEditor->IsDone = DonePtr;
 	TextEditor->Event = &Event;
-	TextEditor->WindowState = &WindowState;
+	TextEditor->WindowState = WindowStatePtr;
 	TextEditor->ChosenFile = &ChosenFile;
+	std::mutex TextEditorAccess;
+	std::mutex *TextEditorAccessPtr = &TextEditorAccess;
 	
 	//Init the image viewer
 	ImageUI *ImageViewer = new ImageUI();
 	ImageViewer->Renderer = Renderer;
 	ImageViewer->Event = &Event;
-	ImageViewer->WindowState = &WindowState;
+	ImageViewer->WindowState = WindowStatePtr;
 	ImageViewer->ChosenFile = &ChosenFile;
+	std::mutex ImageViewerAccess;
+	std::mutex *ImageViewerAccessPtr = &ImageViewerAccess;
 	
-	//Main loop
+	//Input loop thread
+	std::thread InputLoopThread([DonePtr, WindowStatePtr, Explorer, Menu, TextEditor, ImageViewer, ExplorerAccessPtr, TextEditorAccessPtr, ImageViewerAccessPtr]()
+	{
+		while(!*DonePtr)
+		{
+			switch(*WindowStatePtr)
+			{
+				//Get explorer input.
+				case 0:
+				{
+					ExplorerAccessPtr->lock();
+					Explorer->GetInput();
+					//If switched to the text editor we need to load the file
+					if(*WindowStatePtr == 2)
+					{
+						TextEditorAccessPtr->lock();
+						TextEditor->LoadFile();
+						TextEditorAccessPtr->unlock();
+					}
+					else if(*WindowStatePtr == 3)
+					{
+						ImageViewerAccessPtr->lock();
+						ImageViewer->LoadFile();
+						ImageViewerAccessPtr->unlock();
+					}
+					ExplorerAccessPtr->unlock();
+				}
+				break;
+				//Get the sub menu input
+				case 1:
+				{
+					ExplorerAccessPtr->lock();
+					Menu->GetInput();
+					ExplorerAccessPtr->unlock();
+				}
+				break;
+				//Get the text editor input
+				case 2:
+				{
+					TextEditorAccessPtr->lock();
+					TextEditor->GetInput();
+					TextEditorAccessPtr->unlock();
+				}
+				break;
+				//Get the image viewer input
+				case 3:
+				{
+					ImageViewer->GetInput();
+				}
+				break;
+			}
+		}
+	});
+	
+	//Main gui loop
 	while(!Done)
 	{
 		//Clear the frame
@@ -108,33 +171,35 @@ int main(int argc, char* argv[])
 			//Draw the file explorer
 			case 0:
 			{
-				Explorer->GetInput();
+				ExplorerAccess.lock();
+				//Get input and draw the UI
 				Explorer->DrawUI();
-				//If switched to the text editor we need to load the file
-				if(WindowState == 2) TextEditor->LoadFile();
-				else if (WindowState == 3) ImageViewer->LoadFile();
+				ExplorerAccess.unlock();
 			}
 			break;
 			//Draw the menu
 			case 1:
 			{
+				ExplorerAccess.lock();
 				Explorer->DrawUI();
-				Menu->GetInput();
 				Menu->DrawUI();
+				ExplorerAccess.unlock();
 			}
 			break;
 			//Draw the text editor
 			case 2:
 			{
-				TextEditor->GetInput();
+				TextEditorAccess.lock();
 				TextEditor->DrawUI();
+				TextEditorAccess.unlock();
 			}
 			break;
 			//Draw the image viewer
 			case 3:
 			{
-				ImageViewer->GetInput();
+				ImageViewerAccess.lock();
 				ImageViewer->DrawUI();
+				ImageViewerAccess.unlock();
 			}
 			break;
 			//Long opperation display window
@@ -148,6 +213,8 @@ int main(int argc, char* argv[])
 		//Draw the frame
         SDL_RenderPresent(Renderer);
 	}
+	
+	InputLoopThread.join();
 	
 	//Clean up
 	plExit();

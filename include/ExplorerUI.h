@@ -3,7 +3,7 @@
 #include <dirent.h>
 #include <SDL2/SDL_ttf.h>
 #include <thread>
-
+#include <mutex>
 class ExplorerUI : public UIWindow
 {
 	private:
@@ -11,6 +11,7 @@ class ExplorerUI : public UIWindow
 	int HeaderHeight = 55;
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
+	std::mutex ListAccesMutex;
 	public:
 	//vars
 	ScrollList *FileNameList;
@@ -18,7 +19,7 @@ class ExplorerUI : public UIWindow
 	vector <dirent> Files = vector <dirent>(0);
 	string HighlightedPath = "";
 	string *ChosenFile;
-	string DirPath = "sdmc:/";
+	string DirPath = "sdmc://";
 	//functions
 	ExplorerUI();
 	void GetInput();
@@ -36,7 +37,6 @@ class MenuUI : public UIWindow
 	std::string ClipboardPath = "";
 	std::string ClipboardFileName = "";
 	std::string LongOpMessage = "";
-	std::thread LongOpThread;
 	//functions
 	void RecFileCopy();
 	public:

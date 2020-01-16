@@ -60,12 +60,12 @@ void TextUI::GetInput()
 				//Up pressed
 				if (Event->jbutton.button == 13)
 				{
-					ScrollUp = true;
+					SelectedLine--;
 				}
 				//Down pressed
 				else if(Event->jbutton.button == 15)
 				{
-					ScrollDown = true;
+					SelectedLine++;
 				}
 				//B pressed
 				else if(Event->jbutton.button == 1)

@@ -80,6 +80,15 @@ std::string GetFileSize(std::string Path)
 //Mostly taken from before the rewrite
 void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string FileName)
 {
+	//Don't crash
+	if(SourcePath == "sdmc://")
+	{
+		SourcePath = "sdmc:/";
+	}
+	if(DestPath == "sdmc://")
+	{
+		DestPath = "sdmc:/";
+	}
 	//If dir
 	if(CheckIsDir(SourcePath))
 	{
