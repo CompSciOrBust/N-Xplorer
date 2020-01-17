@@ -154,7 +154,9 @@ int main(int argc, char* argv[])
 				//Get the image viewer input
 				case 3:
 				{
+					ImageViewerAccessPtr->lock();
 					ImageViewer->GetInput();
+					ImageViewerAccessPtr->unlock();
 				}
 				break;
 			}
@@ -172,7 +174,7 @@ int main(int argc, char* argv[])
 			case 0:
 			{
 				ExplorerAccess.lock();
-				//Get input and draw the UI
+				//Draw the UI
 				Explorer->DrawUI();
 				ExplorerAccess.unlock();
 			}

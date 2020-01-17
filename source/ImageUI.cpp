@@ -12,6 +12,10 @@ class ImageUI : public UIWindow
 	float Scalar = 1;
 	float PosOffsetX = 0;
 	float PosOffsetY = 0;
+	float ZoomModifier = 0;
+	float RotationModifier = 0;
+	int Zooming = 0;
+	int Rotating = 0;
 	SDL_Surface* PhotoSurface;
 	SDL_Texture* PhotoTexture;
 	public:
@@ -27,6 +31,26 @@ class ImageUI : public UIWindow
 void ImageUI::DrawUI()
 {
 	PhotoTexture = SDL_CreateTextureFromSurface(Renderer, PhotoSurface);
+	
+	//Change zoom modifer
+	if(Zooming > 0)
+	{
+		ZoomModifier += 0.025;
+	}
+	else if(Zooming < 0)
+	{
+		ZoomModifier -= 0.025;
+	}
+	//Change the rotation modifier
+	if(Rotating > 0)
+	{
+		RotationModifier += 1;
+	}
+	else if(Rotating < 0)
+	{
+		RotationModifier -= 1;
+	}
+	
 	//Check if too big to fit on screen
 	if(PhotoSurface->w > Width || PhotoSurface->h > Height)
 	{
@@ -43,10 +67,13 @@ void ImageUI::DrawUI()
 	{
 		Scalar = 1;
 	}
+	//Add or subtract the modifier
+	Scalar += ZoomModifier;
+	//Actually draw the image
 	SDL_Rect PhotoRect = {0, 0, PhotoSurface->w * Scalar, PhotoSurface->h * Scalar};
 	PhotoRect.x = ((Width - PhotoRect.w) / 2) + PosOffsetX;
 	PhotoRect.y = ((Height - PhotoRect.h) / 2) + PosOffsetY;
-	SDL_RenderCopyEx(Renderer, PhotoTexture, NULL, &PhotoRect, 0, nullptr, SDL_FLIP_NONE);
+	SDL_RenderCopyEx(Renderer, PhotoTexture, NULL, &PhotoRect, RotationModifier, nullptr, SDL_FLIP_NONE);
 	SDL_DestroyTexture(PhotoTexture);
 	usleep(1000000 / 120); //Quick and dirty way to run at about 120 fps
 }
@@ -69,7 +96,56 @@ void ImageUI::GetInput()
 				{
 					*WindowState = 0;
 				}
+				//Up pressed
+				else if(Event->jbutton.button == 13)
+				{
+					Zooming += 1;
+				}
+				//Down pressed
+				else if(Event->jbutton.button == 15)
+				{
+					Zooming -= 1;
+				}
+				//Left pressed
+				else if(Event->jbutton.button == 12)
+				{
+					Rotating -= 1;
+				}
+				//Right pressed
+				else if(Event->jbutton.button == 14)
+				{
+					Rotating += 1;
+				}
 			}
+			break;
+			
+			//button up
+			case SDL_JOYBUTTONUP:
+			//Joycon 1 button released
+			if (Event->jbutton.which == 0)
+			{
+				//Up released
+				if(Event->jbutton.button == 13)
+				{
+					Zooming -= 1;
+				}
+				//Down released
+				else if(Event->jbutton.button == 15)
+				{
+					Zooming += 1;
+				}
+				//Left released
+				else if(Event->jbutton.button == 12)
+				{
+					Rotating += 1;
+				}
+				//Right released
+				else if(Event->jbutton.button == 14)
+				{
+					Rotating -= 1;
+				}
+			}
+			break;
 		}
 	}
 }
@@ -77,6 +153,11 @@ void ImageUI::GetInput()
 void ImageUI::LoadFile()
 {
 	PhotoSurface = IMG_Load(ChosenFile->c_str());
+	Scalar = 1;
 	PosOffsetX = 0;
 	PosOffsetY = 0;
+	ZoomModifier = 0;
+	RotationModifier = 0;
+	Zooming = 0;
+	Rotating = 0;
 }
