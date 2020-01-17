@@ -3,6 +3,7 @@
 #include <iostream>
 #include <UI.h>
 #include <unistd.h>
+#include <cmath>
 using namespace std;
 
 class ImageUI : public UIWindow
@@ -14,6 +15,8 @@ class ImageUI : public UIWindow
 	float PosOffsetY = 0;
 	float ZoomModifier = 0;
 	float RotationModifier = 0;
+	float PosXModifier = 0;
+	float PosYModifier = 0;
 	int Zooming = 0;
 	int Rotating = 0;
 	SDL_Surface* PhotoSurface;
@@ -50,7 +53,15 @@ void ImageUI::DrawUI()
 	{
 		RotationModifier -= 1;
 	}
-	
+	//Change PosX modifier
+	if(PosXModifier != 0)
+	{
+		PosOffsetX += PosXModifier / 1000;
+	}
+	if(PosYModifier != 0)
+	{
+		PosOffsetY += PosYModifier / 1000;
+	}
 	//Check if too big to fit on screen
 	if(PhotoSurface->w > Width || PhotoSurface->h > Height)
 	{
@@ -116,6 +127,12 @@ void ImageUI::GetInput()
 				{
 					Rotating += 1;
 				}
+				//Y pressed
+				else if(Event->jbutton.button == 10)
+				{
+					//Rottate image
+					//Not Implemented
+				}
 			}
 			break;
 			
@@ -147,6 +164,29 @@ void ImageUI::GetInput()
 			}
 			break;
 		}
+		//Broken code or broken joycons?
+		/*
+		//Reset the pos modifiers
+		PosXModifier = 0;
+		PosYModifier = 0;
+		//Get the position of the joystick
+		if(Event->jaxis.axis == 0)
+		{
+			PosXModifier = Event->jaxis.value;
+		}
+		else if(Event->jaxis.axis == 1)
+		{
+			PosYModifier = Event->jaxis.value;
+		}
+		//Reset the pos modifiers if the modifier is small to combat joycon drift
+		if(abs(PosXModifier) < 10)
+		{
+			PosXModifier = 0;
+		}
+		if(abs(PosYModifier) < 10)
+		{
+			PosYModifier = 0;
+		}*/
 	}
 }
 
@@ -160,4 +200,6 @@ void ImageUI::LoadFile()
 	RotationModifier = 0;
 	Zooming = 0;
 	Rotating = 0;
+	PosXModifier = 0;
+	PosYModifier = 0;
 }

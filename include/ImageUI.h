@@ -10,6 +10,8 @@ class ImageUI : public UIWindow
 	float PosOffsetY = 0;
 	float ZoomModifier = 0;
 	float RotationModifier = 0;
+	float PosXModifier = 0;
+	float PosYModifier = 0;
 	int Zooming = 0;
 	int Rotating = 0;
 	SDL_Surface* PhotoSurface;
