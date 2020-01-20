@@ -102,11 +102,10 @@ void ScrollList::DrawList()
 	}
 	
 	//Make sure we don't try to render a item that doesn't exist
-	while(ListingTextVec.size() > ListingsOnScreen && *PListRenderOffset + ListingsOnScreen > ListingTextVec.size())
+	while(*PListRenderOffset + ListLength > ListingTextVec.size())
 	{
-		*PListRenderOffset = 0;
-		*PCursorIndex = 0;
-		*PSelectedIndex = 0;
+		ListRenderOffset--;
+		SelectedIndex--;
 	}
 	
 	//Draw the list
@@ -129,7 +128,7 @@ void ScrollList::DrawList()
 		
 		//Draw file names
 		SDL_Color TextColour = {255, 255, 255};
-		SDL_Surface* FileNameSurface = TTF_RenderUTF8_Blended_Wrapped(ListFont, ListingTextVec.at(i + *PListRenderOffset).c_str(), TextColour, ListWidth);
+		SDL_Surface* FileNameSurface = TTF_RenderUTF8_Blended(ListFont, ListingTextVec.at(i + *PListRenderOffset).c_str(), TextColour);
 		SDL_Texture* FileNameTexture = SDL_CreateTextureFromSurface(Renderer, FileNameSurface);
 		//Calculate text X and Y Coords
 		int TextY = MenuItem.y + ((MenuItem.h - FileNameSurface->h) / 2);

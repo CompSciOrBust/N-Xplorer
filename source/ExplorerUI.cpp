@@ -123,6 +123,7 @@ void ExplorerUI::GetInput()
 					  //A pressed
 					  else if(Event->jbutton.button == 0)
 					  {
+						  if(Files.empty()) break;
 						  //Check if directory. If not open file.
 						  string FilePath = DirPath + Files.at(FileNameList->SelectedIndex).d_name;
 						  if(CheckIsDir(FilePath))
@@ -192,7 +193,7 @@ void ExplorerUI::DrawHeader()
 	time_t t = time(NULL);
 	struct tm *tm = localtime(&t);
 	char date[87];
-	sprintf(date, "%02d/%02d/%d %02d:%02d ", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min);
+	sprintf(date, "%02d/%02d/%d %02d:%02d:%02d ", tm->tm_mday, tm->tm_mon + 1, tm->tm_year + 1900, tm->tm_hour, tm->tm_min, tm->tm_sec);
 	SDL_Surface* TimeTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, date, TextColour, Width);
 	SDL_Texture* TimeTextTexture = SDL_CreateTextureFromSurface(Renderer, TimeTextSurface);
 	SDL_Rect TimeRect = {Width - TimeTextSurface->w, (HeaderHeight - TimeTextSurface->h) / 2, TimeTextSurface->w, TimeTextSurface->h};
@@ -214,6 +215,9 @@ void ExplorerUI::DrawFooter()
 	//Vars for the text
 	SDL_Color TextColour = {255, 255, 255};
 	//Draw the path
+	//char dbg[256];
+	//sprintf(dbg, "Render offset: %d CursorIndex: %d SelectedIndex: %d", *FileSizeList->PListRenderOffset, *FileSizeList->PCursorIndex, *FileSizeList->PSelectedIndex);
+	//SDL_Surface* PathTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, dbg, TextColour, Width);
 	SDL_Surface* PathTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, DirPath.c_str(), TextColour, Width);
 	SDL_Texture* PathTextTexture = SDL_CreateTextureFromSurface(Renderer, PathTextSurface);
 	SDL_Rect PathRect = {0, (Height - FooterHeight) + (FooterHeight - PathTextSurface->h) / 2, PathTextSurface->w, PathTextSurface->h};
