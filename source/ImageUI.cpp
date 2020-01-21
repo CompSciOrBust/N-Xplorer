@@ -21,6 +21,7 @@ class ImageUI : public UIWindow
 	int Rotating = 0;
 	SDL_Surface* PhotoSurface;
 	SDL_Texture* PhotoTexture;
+	bool ReloadTexture = true;
 	public:
 	//vars
 	string *ChosenFile;
@@ -33,7 +34,11 @@ class ImageUI : public UIWindow
 //A lot of this is taken from before the rewrite
 void ImageUI::DrawUI()
 {
-	PhotoTexture = SDL_CreateTextureFromSurface(Renderer, PhotoSurface);
+	if(ReloadTexture)
+	{
+		PhotoTexture = SDL_CreateTextureFromSurface(Renderer, PhotoSurface);
+		ReloadTexture = false;
+	}
 	
 	//Change zoom modifer
 	if(Zooming > 0)
@@ -45,23 +50,21 @@ void ImageUI::DrawUI()
 		ZoomModifier -= 0.025;
 	}
 	//Change the rotation modifier
-	if(Rotating > 0)
+	if(Rotating > 0.0f)
 	{
 		RotationModifier += 1;
 	}
-	else if(Rotating < 0)
+	else if(Rotating < 0.0f)
 	{
 		RotationModifier -= 1;
 	}
-	//Change PosX modifier
-	if(PosXModifier != 0)
-	{
-		PosOffsetX += PosXModifier / 1000;
-	}
-	if(PosYModifier != 0)
-	{
-		PosOffsetY += PosYModifier / 1000;
-	}
+	
+	//Change the pos modifiers
+	PosOffsetX += PosXModifier / 1000;
+	PosOffsetY += PosYModifier / 1000;
+	PosXModifier = 0;
+	PosYModifier = 0;
+	
 	//Check if too big to fit on screen
 	if(PhotoSurface->w > Width || PhotoSurface->h > Height)
 	{
@@ -85,13 +88,13 @@ void ImageUI::DrawUI()
 	PhotoRect.x = ((Width - PhotoRect.w) / 2) + PosOffsetX;
 	PhotoRect.y = ((Height - PhotoRect.h) / 2) + PosOffsetY;
 	SDL_RenderCopyEx(Renderer, PhotoTexture, NULL, &PhotoRect, RotationModifier, nullptr, SDL_FLIP_NONE);
-	SDL_DestroyTexture(PhotoTexture);
 	usleep(1000000 / 120); //Quick and dirty way to run at about 120 fps
 }
 
 //TODO: Implement rotating, zooming, and moving
 void ImageUI::GetInput()
 {
+	
 	//Scan input
 	while (SDL_PollEvent(Event))
 	{
@@ -163,30 +166,19 @@ void ImageUI::GetInput()
 				}
 			}
 			break;
+			
+			//Stick movement
+			case SDL_JOYAXISMOTION:
+			if(Event->jaxis.axis == 0)
+			{
+				PosXModifier = Event->jaxis.value;
+			}
+			else if(Event->jaxis.axis == 1)
+			{
+				PosYModifier = Event->jaxis.value;
+			}
+			break;
 		}
-		//Broken code or broken joycons?
-		/*
-		//Reset the pos modifiers
-		PosXModifier = 0;
-		PosYModifier = 0;
-		//Get the position of the joystick
-		if(Event->jaxis.axis == 0)
-		{
-			PosXModifier = Event->jaxis.value;
-		}
-		else if(Event->jaxis.axis == 1)
-		{
-			PosYModifier = Event->jaxis.value;
-		}
-		//Reset the pos modifiers if the modifier is small to combat joycon drift
-		if(abs(PosXModifier) < 10)
-		{
-			PosXModifier = 0;
-		}
-		if(abs(PosYModifier) < 10)
-		{
-			PosYModifier = 0;
-		}*/
 	}
 }
 
@@ -202,4 +194,6 @@ void ImageUI::LoadFile()
 	Rotating = 0;
 	PosXModifier = 0;
 	PosYModifier = 0;
+	SDL_DestroyTexture(PhotoTexture);
+	ReloadTexture = true;
 }

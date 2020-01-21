@@ -84,8 +84,8 @@ void ExplorerUI::GetInput()
 			  {
 				  if (Event->jbutton.which == 0)
 				  {
-					  //Plus or Y pressed
-					  if(Event->jbutton.button == 10 || Event->jbutton.button == 3)
+					  //Y pressed
+					  if(Event->jbutton.button == 3)
 					  {
 						  //Update highlighted file if one exists
 						  if(!FileNameList->ListingTextVec.empty())
@@ -97,6 +97,11 @@ void ExplorerUI::GetInput()
 							  HighlightedPath = "";
 						  }
 						  *WindowState = 1;
+					  }
+					  //Plus pressed
+					  else if(Event->jbutton.button == 10)
+					  {
+						  *IsDone = 1;
 					  }
 					  //Up pressed
 					  else if(Event->jbutton.button == 13)

@@ -16,6 +16,7 @@ class ImageUI : public UIWindow
 	int Rotating = 0;
 	SDL_Surface* PhotoSurface;
 	SDL_Texture* PhotoTexture;
+	bool ReloadTexture = true;
 	public:
 	//vars
 	string *ChosenFile;
