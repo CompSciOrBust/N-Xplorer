@@ -89,6 +89,11 @@ void TextUI::GetInput()
 					string EditedLine = GetKeyboardInput("Done", "Edit line", LinesVec.at(SelectedLine));
 					LinesVec.at(SelectedLine) = EditedLine;
 				}
+				//Minus pressed (temp code until save as option is added)
+				else if(Event->jbutton.button == 11)
+				{
+					*WindowState = 0;
+				}
 			}
 		}
 	}

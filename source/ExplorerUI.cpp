@@ -118,12 +118,82 @@ void ExplorerUI::GetInput()
 					  //Left pressed
 					  else if(Event->jbutton.button == 12)
 					  {
-						  //Todo fast move
+						  //If less items than there are spaces then move to the first item
+						  if(FileNameList->ListingsOnScreen > FileNameList->ListingTextVec.size())
+						  {
+							  FileNameList->SelectedIndex = 0;
+							  FileNameList->CursorIndex = 0;
+						  }
+						  //If the cursor is on the first item on the screen then move the cursor by the number of items on screen
+						  else if(FileNameList->CursorIndex == 0)
+						  {
+							  //If we are on the first item jump to the last
+							  if(FileNameList->SelectedIndex == 0)
+							  {
+								  FileNameList->SelectedIndex = FileNameList->ListingTextVec.size() -1;
+								  FileNameList->CursorIndex = FileNameList->ListingsOnScreen -1;
+								  FileNameList->ListRenderOffset = FileNameList->ListingTextVec.size() -1 - FileNameList->CursorIndex;
+							  }
+							  else
+							  {
+								FileNameList->ListRenderOffset -= FileNameList->ListingsOnScreen;
+								FileNameList->SelectedIndex -= FileNameList->ListingsOnScreen;
+								FileNameList->CursorIndex = 0;
+							  }
+							  //Stop on the first item if we go past it
+							  if(FileNameList->SelectedIndex < 0)
+							  {
+								  FileNameList->ListRenderOffset = 0;
+								  FileNameList->SelectedIndex = 0;
+								  FileNameList->CursorIndex = 0;
+							  }
+						  }
+						  //If cursor isn't on the first item on screen then jump to it
+						  else
+						  {
+							  FileNameList->SelectedIndex -= FileNameList->CursorIndex;
+							  FileNameList->CursorIndex = 0;
+						  }
 					  }
 					  //Right pressed
 					  else if(Event->jbutton.button == 14)
 					  {
-						  //Todo fast move
+						  //If less items than there are spaces then move to the last item
+						  if(FileNameList->ListingsOnScreen > FileNameList->ListingTextVec.size())
+						  {
+							  FileNameList->SelectedIndex = FileNameList->ListingTextVec.size()-1;
+							  FileNameList->CursorIndex = FileNameList->ListingTextVec.size()-1;
+						  }
+						  //If the cursor is on the last item on the screen then move the cursor by the number of items on screen
+						  else if(FileNameList->CursorIndex == FileNameList->ListingsOnScreen -1)
+						  {
+							  //If we're on the last item jump to the first
+							  if(FileNameList->SelectedIndex == FileNameList->ListingTextVec.size()-1)
+							  {
+								  FileNameList->ListRenderOffset = 0;
+								  FileNameList->SelectedIndex = 0;
+								  FileNameList->CursorIndex = 0;
+							  }
+							  else
+							  {
+								  FileNameList->ListRenderOffset += FileNameList->ListingsOnScreen - 1;
+								  FileNameList->SelectedIndex += FileNameList->ListingsOnScreen;
+								  FileNameList->CursorIndex = FileNameList->ListingsOnScreen;
+							  }
+							  //If we go past the last item jump back to it
+							  if(FileNameList->SelectedIndex > FileNameList->ListingTextVec.size())
+							  {
+								  FileNameList->SelectedIndex = FileNameList->ListingTextVec.size() -1;
+								  FileNameList->CursorIndex = FileNameList->ListingsOnScreen;
+								  FileNameList->ListRenderOffset = FileNameList->ListingTextVec.size() -1 - FileNameList->CursorIndex;
+							  }
+						  }
+						  //If cursor isn't on the last item on screen then jump to it
+						  else
+						  {
+							  FileNameList->SelectedIndex += FileNameList->ListingsOnScreen - FileNameList->CursorIndex -1;
+							  FileNameList->CursorIndex = FileNameList->ListingsOnScreen -1;
+						  }
 					  }
 					  //A pressed
 					  else if(Event->jbutton.button == 0)
