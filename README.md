@@ -10,9 +10,15 @@ To build use the latest version of [LibNX](https://github.com/switchbrew/libnx) 
 
 Up / Down buttons to move up and down the list
 
+Left button quickly jump up through the list
+
+Right button quick jump down through the list
+
 A to open a file / folder
 
-Plus / Y to open and close the sub menu
+Y to open and close the sub menu
+
+Plus to quick exit
 
 ### Text Editor
 
@@ -26,9 +32,17 @@ Right adds a line
 
 B save and exit
 
+Minus exit without saving (temporary for now)
+
 ### Image Viewer
 
 B exit
+
+Left / Right buttons to rotate the image
+
+Up / Down buttons to zoom
+
+Left stick to move
 
 ## Credits
 LibNX and DevkitPro for making the toolchain.
