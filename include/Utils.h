@@ -10,3 +10,4 @@ bool CheckFileExists(std::string);
 std::string GetKeyboardInput(std::string, std::string, std::string);
 std::string GetFileSize(std::string);
 void RecursiveFileCopy(std::string, std::string, std::string);
+std::string GetFileExtension(std::string);

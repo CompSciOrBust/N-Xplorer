@@ -19,6 +19,7 @@ class ExplorerUI : public UIWindow
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
 	std::mutex ListAccesMutex;
+	vector <int> ListOffsets = vector <int>(0);
 	public:
 	//vars
 	ScrollList *FileNameList;
@@ -205,6 +206,10 @@ void ExplorerUI::GetInput()
 						  {
 								DirPath = FilePath + "/";
 								LoadListDirs(DirPath);
+								//Store cursor position
+								ListOffsets.push_back(FileNameList->ListRenderOffset);
+								ListOffsets.push_back(FileNameList->CursorIndex);
+								ListOffsets.push_back(FileNameList->SelectedIndex);
 								//Reset the cursor
 								FileNameList->SelectedIndex = 0;
 								FileNameList->CursorIndex = 0;
@@ -221,9 +226,22 @@ void ExplorerUI::GetInput()
 						  DirPath = GoUpDir(DirPath) + "/";
 						  LoadListDirs(DirPath);
 						  //Reset the cursor
-						  FileNameList->SelectedIndex = 0;
-						  FileNameList->CursorIndex = 0;
-						  FileNameList->ListRenderOffset = 0;
+						  if(ListOffsets.empty())
+						  {
+							FileNameList->SelectedIndex = 0;
+							FileNameList->CursorIndex = 0;
+							FileNameList->ListRenderOffset = 0;
+						  }
+						  else
+						  {
+							//If the offsets list isn't empty restore the curosr position
+							FileNameList->SelectedIndex = ListOffsets.back();
+							ListOffsets.pop_back();
+							FileNameList->CursorIndex = ListOffsets.back();
+							ListOffsets.pop_back();
+							FileNameList->ListRenderOffset = ListOffsets.back();
+							ListOffsets.pop_back();
+						  }
 					  }
 				  }
 			  }
@@ -316,9 +334,7 @@ void ExplorerUI::DrawFooter()
 
 void ExplorerUI::OpenFile(string Path)
 {
-	int ExtensionStart = Path.find(".")+1;
-	string FileSuffix;
-	FileSuffix.assign(Path, ExtensionStart, Path.size() - ExtensionStart);
+	string FileSuffix = GetFileExtension(Path);
 	if(FileSuffix == "png" || FileSuffix == "jpg" || FileSuffix == "jpeg" || FileSuffix == "bmp")
 	{
 		*WindowState = 3;
@@ -491,7 +507,6 @@ void MenuUI::GetInput()
 									*WindowState = 4;
 									RecFileCopy();
 								}
-							  //if(!ClipboardPath.empty()) RecursiveFileCopy(ClipboardPath.c_str(), Explorer->DirPath.c_str(), ClipboardFileName.c_str());
 							}
 							break;
 							//Move
@@ -517,7 +532,13 @@ void MenuUI::GetInput()
 							//New dir
 							case 4:
 							{
-								string NewDirName = Explorer->DirPath + GetKeyboardInput("Done", "Enter folder name", "New Folder");
+								string DirNameInput = Explorer->DirPath + GetKeyboardInput("Done", "Enter folder name", "New Folder");
+								string NewDirName = DirNameInput;
+								int NumDirsAlreadyExist = 1;
+								while(CheckFileExists(NewDirName))
+								{
+									NewDirName = DirNameInput + " (" + to_string(++NumDirsAlreadyExist) + ")";
+								}
 								mkdir(NewDirName.c_str(), 0);
 							}
 							break;

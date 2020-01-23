@@ -12,6 +12,7 @@ class ExplorerUI : public UIWindow
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
 	std::mutex ListAccesMutex;
+	vector <int> ListOffsets = vector <int>(0);
 	public:
 	//vars
 	ScrollList *FileNameList;

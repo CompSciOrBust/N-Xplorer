@@ -119,3 +119,11 @@ void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string
 		dst << src.rdbuf();
 	}
 }
+
+std::string GetFileExtension(std::string Path)
+{
+	int ExtensionStart = Path.find(".")+1;
+	std::string FileSuffix;
+	FileSuffix.assign(Path, ExtensionStart, Path.size() - ExtensionStart);
+	return FileSuffix;
+}
