@@ -27,7 +27,7 @@ class ExplorerUI : public UIWindow
 	vector <dirent> Files = vector <dirent>(0);
 	string HighlightedPath = "";
 	string *ChosenFile;
-	string DirPath = "sdmc://";
+	string DirPath = "mount:/";
 	//functions
 	ExplorerUI();
 	void GetInput();
@@ -86,7 +86,7 @@ void ExplorerUI::GetInput()
 				  if (Event->jbutton.which == 0)
 				  {
 					  //Y pressed
-					  if(Event->jbutton.button == 3)
+					  if(Event->jbutton.button == 3 && DirPath != "mount:/")
 					  {
 						  //Update highlighted file if one exists
 						  if(!FileNameList->ListingTextVec.empty())
@@ -107,101 +107,43 @@ void ExplorerUI::GetInput()
 					  //Up pressed
 					  else if(Event->jbutton.button == 13)
 					  {
-						  FileNameList->CursorIndex--;
-						  FileNameList->SelectedIndex--;
+						  FileNameList->MoveUp();
 					  }
 					  //Down pressed
 					  else if(Event->jbutton.button == 15)
 					  {
-						  FileNameList->CursorIndex++;
-						  FileNameList->SelectedIndex++;
+						  FileNameList->MoveDown();
 					  }
 					  //Left pressed
 					  else if(Event->jbutton.button == 12)
 					  {
-						  //If less items than there are spaces then move to the first item
-						  if(FileNameList->ListingsOnScreen > FileNameList->ListingTextVec.size())
-						  {
-							  FileNameList->SelectedIndex = 0;
-							  FileNameList->CursorIndex = 0;
-						  }
-						  //If the cursor is on the first item on the screen then move the cursor by the number of items on screen
-						  else if(FileNameList->CursorIndex == 0)
-						  {
-							  //If we are on the first item jump to the last
-							  if(FileNameList->SelectedIndex == 0)
-							  {
-								  FileNameList->SelectedIndex = FileNameList->ListingTextVec.size() -1;
-								  FileNameList->CursorIndex = FileNameList->ListingsOnScreen -1;
-								  FileNameList->ListRenderOffset = FileNameList->ListingTextVec.size() -1 - FileNameList->CursorIndex;
-							  }
-							  else
-							  {
-								FileNameList->ListRenderOffset -= FileNameList->ListingsOnScreen;
-								FileNameList->SelectedIndex -= FileNameList->ListingsOnScreen;
-								FileNameList->CursorIndex = 0;
-							  }
-							  //Stop on the first item if we go past it
-							  if(FileNameList->SelectedIndex < 0)
-							  {
-								  FileNameList->ListRenderOffset = 0;
-								  FileNameList->SelectedIndex = 0;
-								  FileNameList->CursorIndex = 0;
-							  }
-						  }
-						  //If cursor isn't on the first item on screen then jump to it
-						  else
-						  {
-							  FileNameList->SelectedIndex -= FileNameList->CursorIndex;
-							  FileNameList->CursorIndex = 0;
-						  }
+						  FileNameList->JumpUp();
 					  }
 					  //Right pressed
 					  else if(Event->jbutton.button == 14)
 					  {
-						  //If less items than there are spaces then move to the last item
-						  if(FileNameList->ListingsOnScreen > FileNameList->ListingTextVec.size())
-						  {
-							  FileNameList->SelectedIndex = FileNameList->ListingTextVec.size()-1;
-							  FileNameList->CursorIndex = FileNameList->ListingTextVec.size()-1;
-						  }
-						  //If the cursor is on the last item on the screen then move the cursor by the number of items on screen
-						  else if(FileNameList->CursorIndex == FileNameList->ListingsOnScreen -1)
-						  {
-							  //If we're on the last item jump to the first
-							  if(FileNameList->SelectedIndex == FileNameList->ListingTextVec.size()-1)
-							  {
-								  FileNameList->ListRenderOffset = 0;
-								  FileNameList->SelectedIndex = 0;
-								  FileNameList->CursorIndex = 0;
-							  }
-							  else
-							  {
-								  FileNameList->ListRenderOffset += FileNameList->ListingsOnScreen - 1;
-								  FileNameList->SelectedIndex += FileNameList->ListingsOnScreen;
-								  FileNameList->CursorIndex = FileNameList->ListingsOnScreen;
-							  }
-							  //If we go past the last item jump back to it
-							  if(FileNameList->SelectedIndex > FileNameList->ListingTextVec.size())
-							  {
-								  FileNameList->SelectedIndex = FileNameList->ListingTextVec.size() -1;
-								  FileNameList->CursorIndex = FileNameList->ListingsOnScreen;
-								  FileNameList->ListRenderOffset = FileNameList->ListingTextVec.size() -1 - FileNameList->CursorIndex;
-							  }
-						  }
-						  //If cursor isn't on the last item on screen then jump to it
-						  else
-						  {
-							  FileNameList->SelectedIndex += FileNameList->ListingsOnScreen - FileNameList->CursorIndex -1;
-							  FileNameList->CursorIndex = FileNameList->ListingsOnScreen -1;
-						  }
+						  FileNameList->JumpDown();
 					  }
 					  //A pressed
 					  else if(Event->jbutton.button == 0)
 					  {
+						  //If not in a partition show partition list
+						  if(DirPath == "mount:/")
+						  {
+							  DirPath = FileNameList->ListingTextVec.at(FileNameList->SelectedIndex);
+							  LoadListDirs(DirPath);
+							  //Store cursor position
+							  ListOffsets.push_back(FileNameList->ListRenderOffset);
+							  ListOffsets.push_back(FileNameList->CursorIndex);
+							  ListOffsets.push_back(FileNameList->SelectedIndex);
+							  //Reset the cursor
+							  FileNameList->ResetPos();
+							  break;
+						  }
+						  //If there are no files don't do anything
 						  if(Files.empty()) break;
-						  //Check if directory. If not open file.
 						  string FilePath = DirPath + Files.at(FileNameList->SelectedIndex).d_name;
+						  //Check if directory. If not open file.
 						  if(CheckIsDir(FilePath))
 						  {
 								DirPath = FilePath + "/";
@@ -211,9 +153,7 @@ void ExplorerUI::GetInput()
 								ListOffsets.push_back(FileNameList->CursorIndex);
 								ListOffsets.push_back(FileNameList->SelectedIndex);
 								//Reset the cursor
-								FileNameList->SelectedIndex = 0;
-								FileNameList->CursorIndex = 0;
-								FileNameList->ListRenderOffset = 0; //Reminder to future self. Reset this var or fatals will occur of which crash report won't help debug.
+								FileNameList->ResetPos();
 						  }
 						  else
 						  {
@@ -228,9 +168,7 @@ void ExplorerUI::GetInput()
 						  //Reset the cursor
 						  if(ListOffsets.empty())
 						  {
-							FileNameList->SelectedIndex = 0;
-							FileNameList->CursorIndex = 0;
-							FileNameList->ListRenderOffset = 0;
+							FileNameList->ResetPos();
 						  }
 						  else
 						  {
@@ -355,14 +293,28 @@ void ExplorerUI::OpenFile(string Path)
 
 void ExplorerUI::LoadListDirs(string DirPath)
 {
-	Files = LoadDirs(DirPath);
 	ListAccesMutex.lock();
+	//clear the lists
 	FileNameList->ListingTextVec.clear();
 	FileSizeList->ListingTextVec.clear();
-	for(int i = 0; i < Files.size(); i++)
+	//If no drive selected show drives
+	if(DirPath == "mount:/")
 	{
-		FileNameList->ListingTextVec.push_back(Files.at(i).d_name);
-		FileSizeList->ListingTextVec.push_back(GetFileSize(DirPath + "/" + Files.at(i).d_name));
+		FileNameList->ListingTextVec.push_back("sdmc:/");
+		FileSizeList->ListingTextVec.push_back("SD card");
+		FileNameList->ListingTextVec.push_back("user:/");
+		FileSizeList->ListingTextVec.push_back("NAND");
+		FileNameList->ListingTextVec.push_back("sys:/");
+		FileSizeList->ListingTextVec.push_back("NAND");
+	}
+	else
+	{
+		Files = LoadDirs(DirPath);
+		for(int i = 0; i < Files.size(); i++)
+		{
+			FileNameList->ListingTextVec.push_back(Files.at(i).d_name);
+			FileSizeList->ListingTextVec.push_back(GetFileSize(DirPath + "/" + Files.at(i).d_name));
+		}
 	}
 	ListAccesMutex.unlock();
 }

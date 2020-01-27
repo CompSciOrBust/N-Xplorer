@@ -39,6 +39,11 @@ class ScrollList
 	bool CenterText = false;
 	ScrollList();
 	void Enslave(ScrollList*);
+	void MoveUp();
+	void MoveDown();
+	void JumpUp();
+	void JumpDown();
+	void ResetPos();
 };
 
 ScrollList::ScrollList()
@@ -169,6 +174,105 @@ void ScrollList::DrawList()
 		SDL_DestroyTexture(FileNameTexture);
 		SDL_FreeSurface(FileNameSurface);
 	}
+}
+
+void ScrollList::JumpDown()
+{
+	//If less items than there are spaces then move to the last item
+	if(ListingsOnScreen > ListingTextVec.size())
+	{
+		SelectedIndex = ListingTextVec.size()-1;
+		CursorIndex = ListingTextVec.size()-1;
+	}
+	//If the cursor is on the last item on the screen then move the cursor by the number of items on screen
+	else if(CursorIndex == ListingsOnScreen -1)
+	{
+		//If we're on the last item jump to the first
+		if(SelectedIndex == ListingTextVec.size()-1)
+		{
+			ListRenderOffset = 0;
+			SelectedIndex = 0;
+			CursorIndex = 0;
+		}
+		else
+		{
+			ListRenderOffset += ListingsOnScreen - 1;
+			SelectedIndex += ListingsOnScreen;
+			CursorIndex = ListingsOnScreen;
+		}
+		//If we go past the last item jump back to it
+		if(SelectedIndex > ListingTextVec.size())
+		{
+			SelectedIndex = ListingTextVec.size() -1;
+			CursorIndex = ListingsOnScreen;
+			ListRenderOffset = ListingTextVec.size() -1 - CursorIndex;
+		}
+	}
+	//If cursor isn't on the last item on screen then jump to it
+	else
+	{
+		SelectedIndex += ListingsOnScreen - CursorIndex -1;
+		CursorIndex = ListingsOnScreen -1;
+	}
+}
+
+void ScrollList::JumpUp()
+{
+	//If less items than there are spaces then move to the first item
+	if(ListingsOnScreen > ListingTextVec.size())
+	{
+		SelectedIndex = 0;
+		CursorIndex = 0;
+	}
+	//If the cursor is on the first item on the screen then move the cursor by the number of items on screen
+	else if(CursorIndex == 0)
+	{
+		//If we are on the first item jump to the last
+		if(SelectedIndex == 0)
+		{
+			SelectedIndex = ListingTextVec.size() -1;
+			CursorIndex = ListingsOnScreen -1;
+			ListRenderOffset = ListingTextVec.size() -1 - CursorIndex;
+		}
+		else
+		{
+			ListRenderOffset -= ListingsOnScreen;
+			SelectedIndex -= ListingsOnScreen;
+			CursorIndex = 0;
+		}
+		//Stop on the first item if we go past it
+		if(SelectedIndex < 0)
+		{
+			ListRenderOffset = 0;
+			SelectedIndex = 0;
+			CursorIndex = 0;
+		}
+	}
+	//If cursor isn't on the first item on screen then jump to it
+	else
+	{
+		SelectedIndex -= CursorIndex;
+		CursorIndex = 0;
+	}
+}
+
+void ScrollList::MoveUp()
+{
+	CursorIndex--;
+	SelectedIndex--;
+}
+
+void ScrollList::MoveDown()
+{
+	CursorIndex++;
+	SelectedIndex++;
+}
+
+void ScrollList::ResetPos()
+{
+	SelectedIndex = 0;
+	CursorIndex = 0;
+	ListRenderOffset = 0;
 }
 
 //Thank you to Nichole Mattera for telling me how to do this

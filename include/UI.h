@@ -49,6 +49,11 @@ class ScrollList
 	bool CenterText = false;
 	ScrollList();
 	void Enslave(ScrollList*);
+	void MoveUp();
+	void MoveDown();
+	void JumpUp();
+	void JumpDown();
+	void ResetPos();
 };
 
 bool CheckButtonPressed(SDL_Rect*, int, int);

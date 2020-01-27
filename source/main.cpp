@@ -25,6 +25,10 @@ int main(int argc, char* argv[])
 	SDL_Event Event;
 	string ChosenFile = "";
 	
+	//Init nx link for printf
+	socketInitializeDefault();
+	nxlinkStdio();
+	
 	//init
     // mandatory at least on switch, else gfx is not properly closed
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
@@ -66,6 +70,16 @@ int main(int argc, char* argv[])
 	
 	TTF_Init(); //Init the font
 	plInitialize(); //Init needed for shared font
+	
+	//Mount the file systems
+	//user
+	FsFileSystem UserFS;
+	fsOpenBisFileSystem(&UserFS, FsBisPartitionId_User, "");
+	fsdevMountDevice("user", UserFS);
+	//System
+	FsFileSystem SysFS;
+	fsOpenBisFileSystem(&SysFS, FsBisPartitionId_System, "");
+	fsdevMountDevice("sys", UserFS);
 	
 	//Init explorer UI
 	ExplorerUI *Explorer = new ExplorerUI();
@@ -219,6 +233,7 @@ int main(int argc, char* argv[])
 	InputLoopThread.join();
 	
 	//Clean up
+	socketExit();
 	plExit();
 	SDL_DestroyRenderer(Renderer);
 	SDL_DestroyWindow(Window);

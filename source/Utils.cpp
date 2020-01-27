@@ -28,11 +28,11 @@ std::string GoUpDir(std::string Path)
 	CurrentPath[Path.length()-1] = 0x00;
 	Path = CurrentPath;
 	int LastSlash = Path.find_last_of('/');
-	CurrentPath[LastSlash] = 0x00;
-	if(strlen(CurrentPath) < 8)
+	if(LastSlash == -1)
 	{
-		return "sdmc:/";
+		return "mount:";
 	}
+	CurrentPath[LastSlash] = 0x00;
 	return CurrentPath;
 }
 
@@ -80,15 +80,6 @@ std::string GetFileSize(std::string Path)
 //Mostly taken from before the rewrite
 void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string FileName)
 {
-	//Don't crash
-	if(SourcePath == "sdmc://")
-	{
-		SourcePath = "sdmc:/";
-	}
-	if(DestPath == "sdmc://")
-	{
-		DestPath = "sdmc:/";
-	}
 	//If dir
 	if(CheckIsDir(SourcePath))
 	{
