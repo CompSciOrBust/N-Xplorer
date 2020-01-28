@@ -130,15 +130,32 @@ void ExplorerUI::GetInput()
 						  //If not in a partition show partition list
 						  if(DirPath == "mount:/")
 						  {
-							  DirPath = FileNameList->ListingTextVec.at(FileNameList->SelectedIndex);
-							  LoadListDirs(DirPath);
-							  //Store cursor position
-							  ListOffsets.push_back(FileNameList->ListRenderOffset);
-							  ListOffsets.push_back(FileNameList->CursorIndex);
-							  ListOffsets.push_back(FileNameList->SelectedIndex);
-							  //Reset the cursor
-							  FileNameList->ResetPos();
-							  break;
+							DirPath = FileNameList->ListingTextVec.at(FileNameList->SelectedIndex);
+							if(DirPath == "sdmc:/")
+							{
+								LoadListDirs(DirPath);
+								//Store cursor position
+								ListOffsets.push_back(FileNameList->ListRenderOffset);
+								ListOffsets.push_back(FileNameList->CursorIndex);
+								ListOffsets.push_back(FileNameList->SelectedIndex);
+								//Reset the cursor
+								FileNameList->ResetPos();
+							}
+							else if(GetParentalControl())
+							{
+								LoadListDirs(DirPath);
+								//Store cursor position
+								ListOffsets.push_back(FileNameList->ListRenderOffset);
+								ListOffsets.push_back(FileNameList->CursorIndex);
+								ListOffsets.push_back(FileNameList->SelectedIndex);
+								//Reset the cursor
+								FileNameList->ResetPos();
+							}
+							else
+							{
+								DirPath = "mount:/";
+							}
+							break;
 						  }
 						  //If there are no files don't do anything
 						  if(Files.empty()) break;

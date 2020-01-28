@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 	//System
 	FsFileSystem SysFS;
 	fsOpenBisFileSystem(&SysFS, FsBisPartitionId_System, "");
-	fsdevMountDevice("sys", UserFS);
+	fsdevMountDevice("sys", SysFS);
 	
 	//Init explorer UI
 	ExplorerUI *Explorer = new ExplorerUI();

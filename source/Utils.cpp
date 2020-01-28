@@ -118,3 +118,27 @@ std::string GetFileExtension(std::string Path)
 	FileSuffix.assign(Path, ExtensionStart, Path.size() - ExtensionStart);
 	return FileSuffix;
 }
+
+bool GetParentalControl()
+{
+	bool ParentalControlIsEnabled = false;
+	pctlInitialize();
+	pctlIsRestrictionEnabled(&ParentalControlIsEnabled);
+	pctlExit();
+	if(ParentalControlIsEnabled)
+	{
+		Result rc = pctlauthShow(true);
+		if(R_SUCCEEDED(rc))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
+}
