@@ -30,9 +30,7 @@ Left deletes a line
 
 Right adds a line
 
-B save and exit
-
-Minus exit without saving (temporary for now)
+B save options
 
 ### Image Viewer
 
