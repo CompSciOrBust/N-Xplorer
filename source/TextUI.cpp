@@ -11,8 +11,10 @@ class TextUI : public UIWindow
 	//vars
 	vector <string> LinesVec;
 	TTF_Font *LineFont;
-	int LineToRenderFrom = 0;
-	int SelectedLine = 0;
+	TTF_Font *SaveOptionFont;
+	TTF_Font *SaveHeaderFont;
+	unsigned int LineToRenderFrom = 0;
+	unsigned int SelectedLine = 0;
 	bool ScrollUp = false;
 	bool ScrollDown = false;
 	int SelectedSaveOption = 0;
@@ -33,7 +35,10 @@ class TextUI : public UIWindow
 
 TextUI::TextUI()
 {
-	LineFont = GetSharedFont(24); //Load the font
+	//Load the font
+	LineFont = GetSharedFont(24);
+	SaveOptionFont = GetSharedFont(32);
+	SaveHeaderFont = GetSharedFont(48);
 }
 
 void TextUI::DrawUI()
@@ -51,20 +56,20 @@ void TextUI::DrawSaveOptions()
 	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
 	int BGWidth = Width * 0.4;
 	int BGHeight = Height * 0.5;
-	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight};
+	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight + 6};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the foreground
 	BGWidth -= 4;
 	BGHeight -= 4;
-	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight * 0.25};
+	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, (int)(BGHeight * 0.25)};
 	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the text
 	SDL_Color TextColour = {255, 255, 255};
 	string MessageText = "Save options";
-	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(GetSharedFont(48), MessageText.c_str(), TextColour, BGWidth);
+	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(SaveHeaderFont, MessageText.c_str(), TextColour, BGWidth);
 	SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
-	SDL_Rect MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, BGRect.y + (BGHeight * 0.25 - MessageTextSurface->h) / 2, MessageTextSurface->w, MessageTextSurface->h};
+	SDL_Rect MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, (int)(BGRect.y + (BGHeight * 0.25 - MessageTextSurface->h) / 2), MessageTextSurface->w, MessageTextSurface->h};
 	SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
 	SDL_DestroyTexture(MessageTextTexture);
 	SDL_FreeSurface(MessageTextSurface);
@@ -73,14 +78,14 @@ void TextUI::DrawSaveOptions()
 	for(int i = 0; i < 3; i++)
 	{
 		//Draw the rects
-		BGRect.y += BGHeight * 0.25;
+		BGRect.y += BGHeight * 0.25 + 2;
 		if(SelectedSaveOption == i) SDL_SetRenderDrawColor(Renderer, 161, 161, 161, 255);
 		else SDL_SetRenderDrawColor(Renderer, 66, 66, 66, 255);
 		SDL_RenderFillRect(Renderer, &BGRect);
 		//Draw the text
-		SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(GetSharedFont(32), OptionsTextVec.at(i).c_str(), TextColour, BGWidth);
+		SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(SaveOptionFont, OptionsTextVec.at(i).c_str(), TextColour, BGWidth);
 		SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
-		MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, BGRect.y + (BGHeight * 0.25 - MessageTextSurface->h) / 2, MessageTextSurface->w, MessageTextSurface->h};
+		MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, (int)(BGRect.y + (BGHeight * 0.25 - MessageTextSurface->h) / 2), MessageTextSurface->w, MessageTextSurface->h};
 		SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
 		SDL_DestroyTexture(MessageTextTexture);
 		SDL_FreeSurface(MessageTextSurface);
@@ -172,11 +177,6 @@ void TextUI::GetInput()
 					string EditedLine = GetKeyboardInput("Done", "Edit line", LinesVec.at(SelectedLine));
 					LinesVec.at(SelectedLine) = EditedLine;
 				}
-				//Minus pressed (temp code until save as option is added)
-				else if(Event->jbutton.button == 11)
-				{
-					*WindowState = 0;
-				}
 			}
 		}
 	}
@@ -198,7 +198,7 @@ void TextUI::SaveFile()
 				remove(ChosenFile->c_str());
 			}
 			//Write the new edited file
-			for(int i = 0; i < LinesVec.size(); i++)
+			for(unsigned int i = 0; i < LinesVec.size(); i++)
 			{
 				FileWriter << LinesVec.at(i);
 				//If not the last line add a new line character
@@ -231,7 +231,7 @@ void TextUI::SaveFile()
 				if(CheckFileExists(NewFileName)) remove(NewFileName.c_str());
 			}
 			//Write the new edited file
-			for(int i = 0; i < LinesVec.size(); i++)
+			for(unsigned int i = 0; i < LinesVec.size(); i++)
 			{
 				FileWriter << LinesVec.at(i);
 				//If not the last line add a new line character
@@ -272,7 +272,7 @@ void TextUI::DrawTextLines()
 	bool NeedsToReDraw = false;
 	Redraw:
 	//Draw the lines
-	for(int i = LineToRenderFrom; i < LinesVec.size(); i++)
+	for(unsigned int i = LineToRenderFrom; i < LinesVec.size(); i++)
 	{
 		//vars
 		bool ThisIsTheSeletcedLine = false;

@@ -7,8 +7,10 @@ class TextUI : public UIWindow
 	//vars
 	vector <string> LinesVec;
 	TTF_Font *LineFont;
-	int LineToRenderFrom = 0;
-	int SelectedLine = 0;
+	TTF_Font *SaveOptionFont;
+	TTF_Font *SaveHeaderFont;
+	unsigned int LineToRenderFrom = 0;
+	unsigned int SelectedLine = 0;
 	bool ScrollUp = false;
 	bool ScrollDown = false;
 	int SelectedSaveOption = 0;
