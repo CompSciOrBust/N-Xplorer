@@ -15,6 +15,7 @@ class TextUI : public UIWindow
 	int SelectedLine = 0;
 	bool ScrollUp = false;
 	bool ScrollDown = false;
+	int SelectedSaveOption = 0;
 	//Functions
 	void DrawTextLines();
 	public:
@@ -24,6 +25,8 @@ class TextUI : public UIWindow
 	TextUI();
 	void GetInput();
 	void DrawUI();
+	void DrawSaveOptions();
+	void GetSaveInput();
 	void LoadFile();
 	void SaveFile();
 };
@@ -40,6 +43,87 @@ void TextUI::DrawUI()
 	SDL_Rect BGRect = {0,0, Width, Height};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	DrawTextLines();
+}
+
+void TextUI::DrawSaveOptions()
+{
+	//Draw the outline
+	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	int BGWidth = Width * 0.4;
+	int BGHeight = Height * 0.5;
+	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight};
+	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the foreground
+	BGWidth -= 4;
+	BGHeight -= 4;
+	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight * 0.25};
+	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the text
+	SDL_Color TextColour = {255, 255, 255};
+	string MessageText = "Save options";
+	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(GetSharedFont(48), MessageText.c_str(), TextColour, BGWidth);
+	SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
+	SDL_Rect MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, BGRect.y + (BGHeight * 0.25 - MessageTextSurface->h) / 2, MessageTextSurface->w, MessageTextSurface->h};
+	SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
+	SDL_DestroyTexture(MessageTextTexture);
+	SDL_FreeSurface(MessageTextSurface);
+	vector <string> OptionsTextVec = {"Save and exit", "Save as and exit", "Exit without saving"}; //This could be stored in the header but ehhhh
+	//Draw the options
+	for(int i = 0; i < 3; i++)
+	{
+		//Draw the rects
+		BGRect.y += BGHeight * 0.25;
+		if(SelectedSaveOption == i) SDL_SetRenderDrawColor(Renderer, 161, 161, 161, 255);
+		else SDL_SetRenderDrawColor(Renderer, 66, 66, 66, 255);
+		SDL_RenderFillRect(Renderer, &BGRect);
+		//Draw the text
+		SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(GetSharedFont(32), OptionsTextVec.at(i).c_str(), TextColour, BGWidth);
+		SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
+		MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, BGRect.y + (BGHeight * 0.25 - MessageTextSurface->h) / 2, MessageTextSurface->w, MessageTextSurface->h};
+		SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
+		SDL_DestroyTexture(MessageTextTexture);
+		SDL_FreeSurface(MessageTextSurface);
+	}
+}
+
+void TextUI::GetSaveInput()
+{
+	while (SDL_PollEvent(Event))
+	{
+		switch(Event->type)
+		{
+			//Button down
+			case SDL_JOYBUTTONDOWN:
+			//Joycon 1 button pressed
+			if (Event->jbutton.which == 0)
+			{
+				//Up pressed
+				if (Event->jbutton.button == 13)
+				{
+					SelectedSaveOption--;
+					if(SelectedSaveOption < 0) SelectedSaveOption = 2;
+					else SelectedSaveOption %= 3;
+				}
+				//Down pressed
+				else if(Event->jbutton.button == 15)
+				{
+					SelectedSaveOption++;
+					SelectedSaveOption %= 3;
+				}
+				//A pressed
+				else if(Event->jbutton.button == 0)
+				{
+					*WindowState = 0;
+				}
+				//B pressed
+				else if(Event->jbutton.button == 1)
+				{
+					*WindowState = 2;
+				}
+			}
+		}
+	}
 }
 
 void TextUI::GetInput()
@@ -70,8 +154,7 @@ void TextUI::GetInput()
 				//B pressed
 				else if(Event->jbutton.button == 1)
 				{
-					SaveFile();
-					*WindowState = 0;
+					*WindowState = 5;
 				}
 				//left pressed
 				else if(Event->jbutton.button == 12)
@@ -102,26 +185,66 @@ void TextUI::GetInput()
 //Save the file
 void TextUI::SaveFile()
 {
-	//Create a output stream
-	ofstream FileWriter(ChosenFile->c_str());
-	//If we are able to write to the file delete the existing file
-	if(FileWriter)
+	switch(SelectedSaveOption)
 	{
-		remove(ChosenFile->c_str());
-	}
-	//Write the new edited file
-	for(int i = 0; i < LinesVec.size(); i++)
-	{
-		FileWriter << LinesVec.at(i);
-		//If not the last line add a new line character
-		if(LinesVec.size() != i+1)
+		//Save and exit
+		case 0:
 		{
-			FileWriter << endl;
+			//Create a output stream
+			ofstream FileWriter(ChosenFile->c_str());
+			//If we are able to write to the file delete the existing file
+			if(FileWriter)
+			{
+				remove(ChosenFile->c_str());
+			}
+			//Write the new edited file
+			for(int i = 0; i < LinesVec.size(); i++)
+			{
+				FileWriter << LinesVec.at(i);
+				//If not the last line add a new line character
+				if(LinesVec.size() != i+1)
+				{
+					FileWriter << endl;
+				}
+			}
+			//Close the stream
+			FileWriter.close();
 		}
+		break;
+		//Save as and exit
+		case 1:
+		{
+			//Good luck trying to figure out how this works lmao
+			char FileName[ChosenFile->size()] = {0};
+			char Path[ChosenFile->size()] = {0};
+			ChosenFile->copy(FileName, ChosenFile->size() - ChosenFile->find_last_of("/"), ChosenFile->find_last_of("/") + 1);
+			ChosenFile->copy(Path, ChosenFile->find_last_of("/") + 1, 0);
+			//Get file name
+			std::string NewFileName = GetKeyboardInput("Done", FileName, FileName);
+			std::string FilePathCXXString = Path;
+			NewFileName.insert(0, FilePathCXXString);
+			//Create a output stream
+			ofstream FileWriter(NewFileName.c_str());
+			//If we are able to write to the file delete the existing file
+			if(FileWriter)
+			{
+				if(CheckFileExists(NewFileName)) remove(NewFileName.c_str());
+			}
+			//Write the new edited file
+			for(int i = 0; i < LinesVec.size(); i++)
+			{
+				FileWriter << LinesVec.at(i);
+				//If not the last line add a new line character
+				if(LinesVec.size() != i+1)
+				{
+					FileWriter << endl;
+				}
+			}
+			//Close the stream
+			FileWriter.close();
+		}
+		break;
 	}
-	//Close the stream
-	FileWriter.close();
-	*this->WindowState = 0;
 }
 
 //This function was largely taken unaltered from before the rewrite
@@ -237,6 +360,7 @@ void TextUI::LoadFile()
 {
 	LineToRenderFrom = 0;
 	SelectedLine = 0;
+	SelectedSaveOption = 0;
 	LinesVec.clear();
 	ifstream FileReader(ChosenFile->c_str());
 	//Can not read file

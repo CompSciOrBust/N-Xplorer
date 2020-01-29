@@ -9,7 +9,6 @@
 #include <ImageUI.h>
 #include <thread>
 #include <mutex>
-
 // Main program entrypoint
 int main(int argc, char* argv[])
 {
@@ -173,6 +172,20 @@ int main(int argc, char* argv[])
 					ImageViewerAccessPtr->unlock();
 				}
 				break;
+				//Text editor save options input
+				case 5:
+				{
+					TextEditorAccessPtr->lock();
+					TextEditor->GetSaveInput();
+					//Save file if user selected option
+					if(*WindowStatePtr == 0)
+					{
+						TextEditor->SaveFile();
+						Explorer->LoadListDirs(Explorer->DirPath);
+					}
+					TextEditorAccessPtr->unlock();
+				}
+				break;
 			}
 		}
 	});
@@ -223,6 +236,15 @@ int main(int argc, char* argv[])
 			{
 				Explorer->DrawUI();
 				Menu->DrawLongOpMessage();
+			}
+			break;
+			//Draw text editor save options
+			case 5:
+			{
+				TextEditorAccess.lock();
+				TextEditor->DrawUI();
+				TextEditor->DrawSaveOptions();
+				TextEditorAccess.unlock();
 			}
 			break;
 		}

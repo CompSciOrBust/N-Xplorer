@@ -11,6 +11,7 @@ class TextUI : public UIWindow
 	int SelectedLine = 0;
 	bool ScrollUp = false;
 	bool ScrollDown = false;
+	int SelectedSaveOption = 0;
 	//Functions
 	void DrawTextLines();
 	public:
@@ -20,6 +21,8 @@ class TextUI : public UIWindow
 	TextUI();
 	void GetInput();
 	void DrawUI();
+	void DrawSaveOptions();
+	void GetSaveInput();
 	void LoadFile();
 	void SaveFile();
 };
