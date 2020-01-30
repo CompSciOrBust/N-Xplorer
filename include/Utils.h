@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <dirent.h>
 
-vector <dirent> LoadDirs(std::string Path);
+std::vector <dirent> SortFiles(std::string, std::vector <dirent>, int);
+std::vector <dirent> LoadDirs(std::string Path);
 std::string GoUpDir(std::string);
 bool CheckIsDir(std::string Path);
 bool CheckFileExists(std::string);

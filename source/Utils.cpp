@@ -6,6 +6,75 @@
 #include <sys/stat.h>
 #include <switch.h>
 #include <fstream>
+#include <algorithm>
+
+std::vector <dirent> SortFiles(std::string Path, std::vector <dirent> FilesVec, int SortMode)
+{
+	switch(SortMode)
+	{
+		//Sort by file size (biggest to smallest)
+		case 0:
+		std::sort(FilesVec.begin(), FilesVec.end(), [Path](dirent A, dirent B) -> bool{
+			struct stat ABuf;
+			struct stat BBuf;
+			std::string APath = Path + A.d_name;
+			std::string BPath = Path + B.d_name;
+			stat(APath.c_str(), &ABuf);
+			stat(BPath.c_str(), &BBuf);
+			if(S_ISDIR(ABuf.st_mode)) return false;
+			return ABuf.st_size > BBuf.st_size;
+		});
+		break;
+		//Sort by file size (smallest to biggest)
+		case 1:
+		std::sort(FilesVec.begin(), FilesVec.end(), [Path](dirent A, dirent B) -> bool{
+			struct stat ABuf;
+			struct stat BBuf;
+			std::string APath = Path + A.d_name;
+			std::string BPath = Path + B.d_name;
+			stat(APath.c_str(), &ABuf);
+			stat(BPath.c_str(), &BBuf);
+			unsigned int ASize = 4294967295;
+			unsigned int BSize = 4294967295;
+			if(!S_ISDIR(ABuf.st_mode)) ASize = ABuf.st_size;
+			if(!S_ISDIR(BBuf.st_mode)) BSize = BBuf.st_size;
+			return ASize < BSize;
+		});
+		break;
+		//Sort by file name A-Z
+		case 2:
+		std::sort(FilesVec.begin(), FilesVec.end(), [](dirent A, dirent B) -> bool{
+			int MaxLength = 0;
+			if(sizeof(A.d_name) > sizeof(B.d_name)) MaxLength = sizeof(A.d_name);
+			else MaxLength = sizeof(B.d_name);
+			int Itterate = 0;
+			while(Itterate < MaxLength)
+			{
+				if(tolower(A.d_name[Itterate]) != tolower(B.d_name[Itterate])) break;
+				else Itterate++;
+			}
+			return tolower(A.d_name[Itterate]) < tolower(B.d_name[Itterate]);
+		});
+		break;
+		//Sort by file name Z-A
+		case 3:
+		std::sort(FilesVec.begin(), FilesVec.end(), [](dirent A, dirent B) -> bool{
+			int MaxLength = 0;
+			if(sizeof(A.d_name) > sizeof(B.d_name)) MaxLength = sizeof(A.d_name);
+			else MaxLength = sizeof(B.d_name);
+			int Itterate = 0;
+			while(Itterate < MaxLength)
+			{
+				if(tolower(A.d_name[Itterate]) != tolower(B.d_name[Itterate])) break;
+				else Itterate++;
+			}
+			return tolower(A.d_name[Itterate]) > tolower(B.d_name[Itterate]);
+		});
+		break;
+		break;
+	}
+	return FilesVec;
+}
 
 std::vector <dirent> LoadDirs(std::string Path)
 {

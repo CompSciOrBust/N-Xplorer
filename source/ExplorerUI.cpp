@@ -368,7 +368,7 @@ MenuUI::MenuUI()
 	MenuList->IsActive = true;
 	MenuList->CenterText = true;
 	//populate list
-	MenuList->ListingTextVec.push_back("Copy");
+	MenuList->ListingTextVec.push_back("Select");
 	MenuList->ListingTextVec.push_back("Paste");
 	MenuList->ListingTextVec.push_back("Move");
 	MenuList->ListingTextVec.push_back("Rename");
