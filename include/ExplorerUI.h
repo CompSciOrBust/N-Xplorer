@@ -12,23 +12,24 @@ class ExplorerUI : public UIWindow
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
 	std::mutex ListAccesMutex;
-	vector <int> ListOffsets = vector <int>(0);
 	public:
 	//vars
 	ScrollList *FileNameList;
 	ScrollList *FileSizeList;
 	vector <dirent> Files = vector <dirent>(0);
-	string HighlightedPath = "";
-	string *ChosenFile;
-	string DirPath = "sdmc://";
+	std::string HighlightedPath = "";
+	std::string *ChosenFile;
+	std::string DirPath = "mount:/";
+	int FileSortMode = 0;
 	//functions
 	ExplorerUI();
 	void GetInput();
 	void DrawUI();
-	void OpenFile(string);
-	void LoadListDirs(string);
+	void OpenFile(std::string);
+	void LoadListDirs(std::string);
 	void DrawHeader();
 	void DrawFooter();
+	void GoToIndexOfFile(std::string);
 };
 
 class MenuUI : public UIWindow

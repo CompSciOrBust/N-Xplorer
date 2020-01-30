@@ -54,6 +54,7 @@ class ScrollList
 	void JumpUp();
 	void JumpDown();
 	void ResetPos();
+	void JumpToIndex(int);
 };
 
 bool CheckButtonPressed(SDL_Rect*, int, int);

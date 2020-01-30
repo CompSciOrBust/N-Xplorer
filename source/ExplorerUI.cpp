@@ -19,23 +19,24 @@ class ExplorerUI : public UIWindow
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
 	std::mutex ListAccesMutex;
-	vector <int> ListOffsets = vector <int>(0);
 	public:
 	//vars
 	ScrollList *FileNameList;
 	ScrollList *FileSizeList;
 	vector <dirent> Files = vector <dirent>(0);
-	string HighlightedPath = "";
-	string *ChosenFile;
-	string DirPath = "mount:/";
+	std::string HighlightedPath = "";
+	std::string *ChosenFile;
+	std::string DirPath = "mount:/";
+	int FileSortMode = 0;
 	//functions
 	ExplorerUI();
 	void GetInput();
 	void DrawUI();
-	void OpenFile(string);
-	void LoadListDirs(string);
+	void OpenFile(std::string);
+	void LoadListDirs(std::string);
 	void DrawHeader();
 	void DrawFooter();
+	void GoToIndexOfFile(std::string);
 };
 
 ExplorerUI::ExplorerUI()
@@ -104,6 +105,16 @@ void ExplorerUI::GetInput()
 					  {
 						  *IsDone = 1;
 					  }
+					  //Minus pressed
+					  else if(Event->jbutton.button == 11)
+					  {
+						  //Temp code for testing purposes
+						  FileSortMode++;
+						  FileSortMode %= 3;
+						  std::string CurrentFileName = Files.at(FileNameList->SelectedIndex).d_name;
+						  LoadListDirs(DirPath);
+						  GoToIndexOfFile(CurrentFileName);
+					  }
 					  //Up pressed
 					  else if(Event->jbutton.button == 13)
 					  {
@@ -134,20 +145,12 @@ void ExplorerUI::GetInput()
 							if(DirPath == "sdmc:/")
 							{
 								LoadListDirs(DirPath);
-								//Store cursor position
-								ListOffsets.push_back(FileNameList->ListRenderOffset);
-								ListOffsets.push_back(FileNameList->CursorIndex);
-								ListOffsets.push_back(FileNameList->SelectedIndex);
 								//Reset the cursor
 								FileNameList->ResetPos();
 							}
 							else if(GetParentalControl())
 							{
 								LoadListDirs(DirPath);
-								//Store cursor position
-								ListOffsets.push_back(FileNameList->ListRenderOffset);
-								ListOffsets.push_back(FileNameList->CursorIndex);
-								ListOffsets.push_back(FileNameList->SelectedIndex);
 								//Reset the cursor
 								FileNameList->ResetPos();
 							}
@@ -165,10 +168,6 @@ void ExplorerUI::GetInput()
 						  {
 								DirPath = FilePath + "/";
 								LoadListDirs(DirPath);
-								//Store cursor position
-								ListOffsets.push_back(FileNameList->ListRenderOffset);
-								ListOffsets.push_back(FileNameList->CursorIndex);
-								ListOffsets.push_back(FileNameList->SelectedIndex);
 								//Reset the cursor
 								FileNameList->ResetPos();
 						  }
@@ -180,28 +179,38 @@ void ExplorerUI::GetInput()
 					  //B pressed
 					  else if(Event->jbutton.button == 1)
 					  {
+						  std::string FileToGoTo = DirPath;
+						  FileToGoTo.erase(0, GoUpDir(DirPath).size()+1);
 						  DirPath = GoUpDir(DirPath) + "/";
 						  LoadListDirs(DirPath);
-						  //Reset the cursor
-						  if(ListOffsets.empty())
-						  {
-							FileNameList->ResetPos();
-						  }
-						  else
-						  {
-							//If the offsets list isn't empty restore the curosr position
-							FileNameList->SelectedIndex = ListOffsets.back();
-							ListOffsets.pop_back();
-							FileNameList->CursorIndex = ListOffsets.back();
-							ListOffsets.pop_back();
-							FileNameList->ListRenderOffset = ListOffsets.back();
-							ListOffsets.pop_back();
-						  }
+						  FileNameList->ResetPos();
+						  if(DirPath != "mount:/") FileToGoTo.erase(FileToGoTo.size()-1, FileToGoTo.size());
+						  GoToIndexOfFile(FileToGoTo);
 					  }
 				  }
 			  }
 			  break;
 		 }
+	}
+}
+
+void ExplorerUI::GoToIndexOfFile(string FileName)
+{
+	if(DirPath != "mount:/")
+	{
+		//Find the cursor pos
+		for(unsigned int i = 0; i < Files.size(); i++)
+		{
+			if(Files.at(i).d_name == FileName)
+			{
+				FileNameList->JumpToIndex(i);
+				break;
+			}
+		}
+	}
+	else
+	{
+		FileNameList->ResetPos();
 	}
 }
 
@@ -327,6 +336,7 @@ void ExplorerUI::LoadListDirs(string DirPath)
 	else
 	{
 		Files = LoadDirs(DirPath);
+		Files = SortFiles(DirPath, Files, FileSortMode);
 		for(int i = 0; i < Files.size(); i++)
 		{
 			FileNameList->ListingTextVec.push_back(Files.at(i).d_name);

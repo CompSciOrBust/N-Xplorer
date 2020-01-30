@@ -44,6 +44,7 @@ class ScrollList
 	void JumpUp();
 	void JumpDown();
 	void ResetPos();
+	void JumpToIndex(int);
 };
 
 ScrollList::ScrollList()
@@ -273,6 +274,17 @@ void ScrollList::ResetPos()
 	SelectedIndex = 0;
 	CursorIndex = 0;
 	ListRenderOffset = 0;
+}
+
+void ScrollList::JumpToIndex(int IndexToJumpTo)
+{
+	ResetPos();
+	SelectedIndex = IndexToJumpTo;
+	for(int i = 0; i != IndexToJumpTo; i++)
+	{
+		if(i + ListingsOnScreen < ListingTextVec.size()) ListRenderOffset++;
+		else CursorIndex++;
+	}
 }
 
 //Thank you to Nichole Mattera for telling me how to do this

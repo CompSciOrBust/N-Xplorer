@@ -71,7 +71,6 @@ std::vector <dirent> SortFiles(std::string Path, std::vector <dirent> FilesVec, 
 			return tolower(A.d_name[Itterate]) > tolower(B.d_name[Itterate]);
 		});
 		break;
-		break;
 	}
 	return FilesVec;
 }
