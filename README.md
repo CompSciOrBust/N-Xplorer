@@ -1,6 +1,9 @@
 # N-Xplorer
 Multi-functional file manager for the Nintendo Switch
 
+
+<a href="https://discord.gg/ZhRn3nn"><img src="https://img.shields.io/discord/673622282790502402?color=green&label=Discord&logo=discord&style=for-the-badge" alt="Discord Server" /></a>
+
 ## Building
 To build use the latest version of [LibNX](https://github.com/switchbrew/libnx) and DevkitPro.
 
