@@ -37,6 +37,7 @@ class ExplorerUI : public UIWindow
 	void DrawHeader();
 	void DrawFooter();
 	void GoToIndexOfFile(std::string);
+	void ChangeFileSortMode();
 };
 
 ExplorerUI::ExplorerUI()
@@ -108,12 +109,7 @@ void ExplorerUI::GetInput()
 					  //Minus pressed
 					  else if(Event->jbutton.button == 11)
 					  {
-						  //Temp code for testing purposes
-						  FileSortMode++;
-						  FileSortMode %= 3;
-						  std::string CurrentFileName = Files.at(FileNameList->SelectedIndex).d_name;
-						  LoadListDirs(DirPath);
-						  GoToIndexOfFile(CurrentFileName);
+						  *WindowState = 6;
 					  }
 					  //Up pressed
 					  else if(Event->jbutton.button == 13)
@@ -192,6 +188,15 @@ void ExplorerUI::GetInput()
 			  break;
 		 }
 	}
+}
+
+void ExplorerUI::ChangeFileSortMode()
+{
+	FileSortMode++;
+	FileSortMode %= 3;
+	std::string CurrentFileName = Files.at(FileNameList->SelectedIndex).d_name;
+	LoadListDirs(DirPath);
+	GoToIndexOfFile(CurrentFileName);
 }
 
 void ExplorerUI::GoToIndexOfFile(string FileName)
@@ -434,7 +439,7 @@ void MenuUI::RecFileCopy()
 
 void MenuUI::GetInput()
 {
-	//ScanInput
+	//Scan input
 	while (SDL_PollEvent(Event))
 	{
 		switch (Event->type)
@@ -444,8 +449,8 @@ void MenuUI::GetInput()
 			{
 				if (Event->jbutton.which == 0)
 				{
-					//Plus or B pressed
-					if(Event->jbutton.button == 10 || Event->jbutton.button == 1)
+					//Plus, B, or Y pressed
+					if(Event->jbutton.button == 10 || Event->jbutton.button == 1 || Event->jbutton.button == 3)
 					{
 					  *WindowState = 0;
 					}

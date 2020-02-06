@@ -30,6 +30,7 @@ class ExplorerUI : public UIWindow
 	void DrawHeader();
 	void DrawFooter();
 	void GoToIndexOfFile(std::string);
+	void ChangeFileSortMode();
 };
 
 class MenuUI : public UIWindow

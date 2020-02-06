@@ -57,5 +57,27 @@ class ScrollList
 	void JumpToIndex(int);
 };
 
+class SimpleList
+{
+	private:
+	//vars
+	TTF_Font *ListOptionFont;
+	int Width = 1280;
+	int Height = 720;
+	public:
+	//vars
+	float HeightModifier = 0.5;
+	SDL_Renderer *Renderer;
+	std::string HeaderText = "Simple list";
+	SDL_Color TextColour = {255, 255, 255};
+	vector <std::string> OptionsTextVec = {"Option one", "Option two", "Option three"};
+	int SelectedOption = 0;
+	//functions
+	SimpleList();
+	void DrawList();
+	void MoveUp();
+	void MoveDown();
+};
+
 bool CheckButtonPressed(SDL_Rect*, int, int);
 TTF_Font *GetSharedFont(int FontSize);

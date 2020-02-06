@@ -7,6 +7,7 @@
 #include <ExplorerUI.h>
 #include <TextUI.h>
 #include <ImageUI.h>
+#include <Settings.h>
 #include <thread>
 #include <mutex>
 // Main program entrypoint
@@ -120,8 +121,14 @@ int main(int argc, char* argv[])
 	std::mutex ImageViewerAccess;
 	std::mutex *ImageViewerAccessPtr = &ImageViewerAccess;
 	
+	//Init the settings menu
+	SettingsUI *SettingsMenu = new SettingsUI();
+	SettingsMenu->Renderer = Renderer;
+	SettingsMenu->Event = &Event;
+	SettingsMenu->WindowState = WindowStatePtr;
+	SettingsMenu->Explorer = Explorer;
 	//Input loop thread
-	std::thread InputLoopThread([DonePtr, WindowStatePtr, Explorer, Menu, TextEditor, ImageViewer, ExplorerAccessPtr, TextEditorAccessPtr, ImageViewerAccessPtr]()
+	std::thread InputLoopThread([DonePtr, WindowStatePtr, Explorer, Menu, TextEditor, ImageViewer, SettingsMenu, ExplorerAccessPtr, TextEditorAccessPtr, ImageViewerAccessPtr]()
 	{
 		while(!*DonePtr)
 		{
@@ -144,6 +151,10 @@ int main(int argc, char* argv[])
 						ImageViewerAccessPtr->lock();
 						ImageViewer->LoadFile();
 						ImageViewerAccessPtr->unlock();
+					}
+					else if(*WindowStatePtr == 6)
+					{
+						SettingsMenu->UpdateSortSettingText();
 					}
 					ExplorerAccessPtr->unlock();
 				}
@@ -184,6 +195,14 @@ int main(int argc, char* argv[])
 						Explorer->LoadListDirs(Explorer->DirPath);
 					}
 					TextEditorAccessPtr->unlock();
+				}
+				break;
+				//N-Xplorer settings input
+				case 6:
+				{
+					ExplorerAccessPtr->lock();
+					SettingsMenu->GetInput();
+					ExplorerAccessPtr->unlock();
 				}
 				break;
 			}
@@ -245,6 +264,15 @@ int main(int argc, char* argv[])
 				TextEditor->DrawUI();
 				TextEditor->DrawSaveOptions();
 				TextEditorAccess.unlock();
+			}
+			break;
+			//Draw N-Xplorer settings
+			case 6:
+			{
+				ExplorerAccess.lock();
+				Explorer->DrawUI();
+				SettingsMenu->DrawUI();
+				ExplorerAccess.unlock();
 			}
 			break;
 		}

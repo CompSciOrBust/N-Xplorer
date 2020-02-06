@@ -124,9 +124,6 @@ void ScrollList::DrawList()
 		if(i == *PCursorIndex && IsActive)
 		{
 			SDL_SetRenderDrawColor(Renderer, ListColourSelected_R, ListColourSelected_G, ListColourSelected_B, 255);
-			//Cyan 50
-			//if(IsActive) SDL_SetRenderDrawColor(Renderer, 224, 247, 250, 255);
-			//else SDL_SetRenderDrawColor(Renderer, 232, 234, 246, 255); //Indigo
 		}
 		
 		SDL_Rect MenuItem = {ListXOffset, ListYOffset + (i * ListingHeight), ListWidth, ListingHeight};
@@ -300,4 +297,82 @@ TTF_Font *GetSharedFontExt(int FontSize)
 	PlFontData standardFontData;
 	plGetSharedFontByType(&standardFontData, PlSharedFontType_NintendoExt );
 	return TTF_OpenFontRW(SDL_RWFromMem(standardFontData.address, standardFontData.size), 1, FontSize);
+}
+
+class SimpleList
+{
+	private:
+	//vars
+	TTF_Font *ListOptionFont;
+	int Width = 1280;
+	int Height = 720;
+	public:
+	//vars
+	float HeightModifier = 0.5;
+	SDL_Renderer *Renderer;
+	std::string HeaderText = "Simple list";
+	SDL_Color TextColour = {255, 255, 255};
+	vector <std::string> OptionsTextVec = {"Option one", "Option two", "Option three"};
+	int SelectedOption = 0;
+	//functions
+	SimpleList();
+	void DrawList();
+	void MoveUp();
+	void MoveDown();
+};
+
+SimpleList::SimpleList()
+{
+	ListOptionFont = GetSharedFont(32);
+}
+
+void SimpleList::DrawList()
+{
+	int ItemCount = (OptionsTextVec.size() + 1);
+	//Draw the outline
+	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	int BGWidth = Width * 0.4;
+	int BGHeight = Height * HeightModifier;
+	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight + (OptionsTextVec.size() * 2)};
+	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the foreground
+	BGWidth -= 4;
+	BGHeight -= 4;
+	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, (int)(BGHeight / ItemCount)};
+	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_RenderFillRect(Renderer, &BGRect);
+	//Draw the header text
+	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(ListOptionFont, HeaderText.c_str(), TextColour, BGWidth);
+	SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
+	SDL_Rect MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, (int)(BGRect.y + (BGHeight / ItemCount - MessageTextSurface->h) / 2), MessageTextSurface->w, MessageTextSurface->h};
+	SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
+	SDL_DestroyTexture(MessageTextTexture);
+	SDL_FreeSurface(MessageTextSurface);
+	//Draw the options
+	for(unsigned int i = 0; i < OptionsTextVec.size(); i++)
+	{
+		//Draw the rects
+		BGRect.y += BGHeight / ItemCount + 2;
+		if(SelectedOption == i) SDL_SetRenderDrawColor(Renderer, 161, 161, 161, 255);
+		else SDL_SetRenderDrawColor(Renderer, 66, 66, 66, 255);
+		SDL_RenderFillRect(Renderer, &BGRect);
+		//Draw the text
+		SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(ListOptionFont, OptionsTextVec.at(i).c_str(), TextColour, BGWidth);
+		SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
+		MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, (int)(BGRect.y + (BGHeight / ItemCount - MessageTextSurface->h) / 2), MessageTextSurface->w, MessageTextSurface->h};
+		SDL_RenderCopy(Renderer, MessageTextTexture, NULL, &MessageTextRect);
+		SDL_DestroyTexture(MessageTextTexture);
+		SDL_FreeSurface(MessageTextSurface);
+	}
+}
+
+void SimpleList::MoveUp()
+{
+	if(--SelectedOption) SelectedOption = OptionsTextVec.size() - 1;
+}
+
+void SimpleList::MoveDown()
+{
+	SelectedOption++;
+	SelectedOption %= OptionsTextVec.size();
 }
