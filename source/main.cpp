@@ -10,6 +10,7 @@
 #include <Settings.h>
 #include <thread>
 #include <mutex>
+
 // Main program entrypoint
 int main(int argc, char* argv[])
 {
@@ -127,6 +128,10 @@ int main(int argc, char* argv[])
 	SettingsMenu->Event = &Event;
 	SettingsMenu->WindowState = WindowStatePtr;
 	SettingsMenu->Explorer = Explorer;
+	
+	//Load the settings and create ini on first start up
+	SettingsMenu->CreateNewIni();
+	
 	//Input loop thread
 	std::thread InputLoopThread([DonePtr, WindowStatePtr, Explorer, Menu, TextEditor, ImageViewer, SettingsMenu, ExplorerAccessPtr, TextEditorAccessPtr, ImageViewerAccessPtr]()
 	{

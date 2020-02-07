@@ -192,8 +192,7 @@ void ExplorerUI::GetInput()
 
 void ExplorerUI::ChangeFileSortMode()
 {
-	FileSortMode++;
-	FileSortMode %= 3;
+	++FileSortMode %= 4;
 	std::string CurrentFileName = Files.at(FileNameList->SelectedIndex).d_name;
 	LoadListDirs(DirPath);
 	GoToIndexOfFile(CurrentFileName);

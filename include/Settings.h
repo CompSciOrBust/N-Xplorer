@@ -1,6 +1,8 @@
 class SettingsUI : public UIWindow
 {
 	private:
+	//functions
+	void SaveINI();
 	//vars
 	SimpleList SettingsList;
 	public:
@@ -11,4 +13,5 @@ class SettingsUI : public UIWindow
 	//vars
 	ExplorerUI *Explorer;
 	void UpdateSortSettingText();
+	void CreateNewIni();
 };
