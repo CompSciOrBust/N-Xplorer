@@ -374,7 +374,7 @@ void SimpleList::DrawList()
 
 void SimpleList::MoveUp()
 {
-	if(--SelectedOption) SelectedOption = OptionsTextVec.size() - 1;
+	if(!SelectedOption--) SelectedOption = OptionsTextVec.size()-1;
 }
 
 void SimpleList::MoveDown()

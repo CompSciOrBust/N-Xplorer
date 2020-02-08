@@ -12,6 +12,7 @@ class SettingsUI : public UIWindow
 	void LoadTheme();
 	//vars
 	SimpleList SettingsList;
+	std::string ThemeName = "";
 	public:
 	//functions
 	SettingsUI();
@@ -20,7 +21,7 @@ class SettingsUI : public UIWindow
 	//vars
 	ExplorerUI *Explorer;
 	MenuUI *ContextMenu;
-	void UpdateSortSettingText();
+	void UpdateSettingsText();
 	void CreateNewIni();
 };
 
@@ -28,7 +29,7 @@ SettingsUI::SettingsUI()
 {
 	SettingsList = SimpleList();
 	SettingsList.HeaderText = "Settings";
-	SettingsList.OptionsTextVec = {"Sort mode:", "Check for updates"};
+	SettingsList.OptionsTextVec = {"Sort mode:", "Theme:", "Check for updates"};
 }
 
 void SettingsUI::DrawUI()
@@ -63,11 +64,28 @@ void SettingsUI::GetInput()
 							case 0:
 							{
 								Explorer->ChangeFileSortMode();
-								UpdateSortSettingText();
+								UpdateSettingsText();
 							}
 							break;
-							//Update append
+							//Change theme
 							case 1:
+							{
+								vector <dirent> ThemeDirs = LoadDirs("sdmc:/config/N-Xplorer/Themes/");
+								for(unsigned int i = 0; i < ThemeDirs.size(); i++)
+								{
+									if(ThemeDirs.at(i).d_name == ThemeName)
+									{
+										if(i+1 == ThemeDirs.size() || ThemeDirs.size() == 1) i = 0;
+										else i++;
+										ThemeName = ThemeDirs.at(i).d_name;
+										break;
+									}
+								}
+								LoadTheme();
+							}
+							break;
+							//Update app
+							case 2:
 							{
 								*WindowState = 7;
 							}
@@ -85,14 +103,16 @@ void SettingsUI::GetInput()
 					{
 						SettingsList.MoveDown();
 					}
+					//Update the list text
+					UpdateSettingsText();
 				}
 			}
 			break;
 		}
-	}	
+	}
 }
 
-void SettingsUI::UpdateSortSettingText()
+void SettingsUI::UpdateSettingsText()
 {
 	std::string BaseText = "Sort mode: ";
 	std::string ModeName;
@@ -120,6 +140,8 @@ void SettingsUI::UpdateSortSettingText()
 		break;
 	}
 	SettingsList.OptionsTextVec.at(0) = BaseText + ModeName;
+	BaseText = "Theme: ";
+	SettingsList.OptionsTextVec.at(1) = BaseText + ThemeName;
 }
 
 void SettingsUI::CreateNewIni()
@@ -131,9 +153,11 @@ void SettingsUI::CreateNewIni()
 	else SettingsIni = new Ini();
 	IniSection * SettingsSection = SettingsIni->findOrCreateSection("Settings", false);
 	IniOption * SortOption = SettingsSection->findOrCreateFirstOption("SortMode", "2", false);
+	IniOption * ThemeOption = SettingsSection->findOrCreateFirstOption("Theme", "Default", false);
 	SettingsIni->writeToFile("sdmc:/config/N-Xplorer/settings.ini");
 	//Load values in to their places
 	Explorer->FileSortMode = std::stoi(SortOption->value, nullptr, 10);
+	ThemeName = ThemeOption->value;
 	delete SettingsIni;
 	//Chain
 	LoadTheme();
@@ -144,6 +168,7 @@ void SettingsUI::SaveINI()
 	Ini * SettingsIni = Ini::parseFile("sdmc:/config/N-Xplorer/settings.ini");
 	IniSection * SettingsSection = SettingsIni->findSection("Settings", false);
 	SettingsSection->findFirstOption("SortMode", false)->value = std::to_string(Explorer->FileSortMode);
+	SettingsSection->findFirstOption("Theme", false)->value = ThemeName;
 	SettingsIni->writeToFile("sdmc:/config/N-Xplorer/settings.ini");
 	delete SettingsIni;
 }
@@ -171,9 +196,12 @@ void SettingsUI::LoadTheme()
 	int ContextColourSelected_R = 161;
 	int ContextColourSelected_G = 161;
 	int ContextColourSelected_B = 161;
-	int ContextColourTextColour_R = 255;
-	int ContextColourTextColour_G = 255;
-	int ContextColourTextColour_B = 255;
+	int ContextBorderColour_R = 0;
+	int ContextBorderColour_G = 0;
+	int ContextBorderColour_B = 0;
+	int ContextTextColour_R = 255;
+	int ContextTextColour_G = 255;
+	int ContextTextColour_B = 255;
 	//Header and footer
 	int HeaderColour_R = 94;
 	int HeaderColour_G = 94;
@@ -194,8 +222,9 @@ void SettingsUI::LoadTheme()
 	//TODO: Support images
 	
 	//Read the ini
+	std::string ThemeLocation = "sdmc:/config/N-Xplorer/Themes/" + ThemeName + "/Theme.ini";
 	Ini * ThemeIni;
-	if(CheckFileExists("sdmc:/config/N-Xplorer/Theme.ini")) ThemeIni = Ini::parseFile("sdmc:/config/N-Xplorer/Theme.ini");
+	if(CheckFileExists(ThemeLocation)) ThemeIni = Ini::parseFile(ThemeLocation);
 	else ThemeIni = new Ini;
 	IniSection * ThemeColourSection = ThemeIni->findOrCreateSection("MainUI Colours", false);
 	//File names
@@ -218,9 +247,12 @@ void SettingsUI::LoadTheme()
 	ContextColourSelected_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourSelected_R", std::to_string(ContextColourSelected_R), false)->value);
 	ContextColourSelected_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourSelected_G", std::to_string(ContextColourSelected_G), false)->value);
 	ContextColourSelected_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourSelected_B", std::to_string(ContextColourSelected_B), false)->value);
-	ContextColourTextColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourTextColour_R", std::to_string(ContextColourTextColour_R), false)->value);
-	ContextColourTextColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourTextColour_G", std::to_string(ContextColourTextColour_G), false)->value);
-	ContextColourTextColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourTextColour_B", std::to_string(ContextColourTextColour_B), false)->value);
+	ContextBorderColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextBorderColour_R", std::to_string(ContextBorderColour_R), false)->value);
+	ContextBorderColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextBorderColour_G", std::to_string(ContextBorderColour_G), false)->value);
+	ContextBorderColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextBorderColour_B", std::to_string(ContextBorderColour_B), false)->value);
+	ContextTextColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextTextColour_R", std::to_string(ContextTextColour_R), false)->value);
+	ContextTextColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextTextColour_G", std::to_string(ContextTextColour_G), false)->value);
+	ContextTextColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextTextColour_B", std::to_string(ContextTextColour_B), false)->value);
 	//Header and footer
 	HeaderColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("HeaderColour_R", std::to_string(HeaderColour_R), false)->value);
 	HeaderColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("HeaderColour_G", std::to_string(HeaderColour_G), false)->value);
@@ -238,7 +270,11 @@ void SettingsUI::LoadTheme()
 	BGColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("BGColour_R", std::to_string(BGColour_R), false)->value);
 	BGColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("BGColour_G", std::to_string(BGColour_G), false)->value);
 	BGColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("BGColour_B", std::to_string(BGColour_B), false)->value);
-	ThemeIni->writeToFile("sdmc:/config/N-Xplorer/Theme.ini");
+	//Save the theme with entries for backwards compatability
+	std::string ThemeFolder = "sdmc:/config/N-Xplorer/Themes/" + ThemeName;
+	mkdir("sdmc:/config/N-Xplorer/Themes/", 0);
+	mkdir(ThemeFolder.c_str(), 0);
+	ThemeIni->writeToFile(ThemeLocation);
 	delete ThemeIni;
 	//update the vars
 	//File names
@@ -274,9 +310,12 @@ void SettingsUI::LoadTheme()
 	ContextMenu->MenuList->ListColourSelected_R = ContextColourSelected_R;
 	ContextMenu->MenuList->ListColourSelected_G = ContextColourSelected_G;
 	ContextMenu->MenuList->ListColourSelected_B = ContextColourSelected_B;
-	ContextMenu->MenuList->TextColour_R = ContextColourTextColour_R;
-	ContextMenu->MenuList->TextColour_G = ContextColourTextColour_G;
-	ContextMenu->MenuList->TextColour_B = ContextColourTextColour_B;
+	ContextMenu->MenuList->BorderColour_R = ContextBorderColour_R;
+	ContextMenu->MenuList->BorderColour_G = ContextBorderColour_G;
+	ContextMenu->MenuList->BorderColour_B = ContextBorderColour_B;
+	ContextMenu->MenuList->TextColour_R = ContextTextColour_R;
+	ContextMenu->MenuList->TextColour_G = ContextTextColour_G;
+	ContextMenu->MenuList->TextColour_B = ContextTextColour_B;
 	//Header and footer
 	Explorer->HeaderColour_R = HeaderColour_R;
 	Explorer->HeaderColour_G = HeaderColour_G;

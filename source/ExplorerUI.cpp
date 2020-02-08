@@ -208,6 +208,7 @@ void ExplorerUI::GetInput()
 void ExplorerUI::ChangeFileSortMode()
 {
 	++FileSortMode %= 4;
+	if(Files.size() == 0) return;
 	std::string CurrentFileName = Files.at(FileNameList->SelectedIndex).d_name;
 	LoadListDirs(DirPath);
 	GoToIndexOfFile(CurrentFileName);
@@ -411,7 +412,7 @@ MenuUI::MenuUI()
 void MenuUI::DrawUI()
 {
 	//Draw the bg rectangle
-	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(Renderer, MenuList->BorderColour_R, MenuList->BorderColour_G, MenuList->BorderColour_B, 255);
 	SDL_Rect BGRect = {MenuList->ListXOffset - 3, MenuList->ListYOffset , MenuList->ListWidth , MenuList->ListHeight + 3};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the list

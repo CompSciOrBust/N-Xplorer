@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
 					}
 					else if(*WindowStatePtr == 6)
 					{
-						SettingsMenu->UpdateSortSettingText();
+						SettingsMenu->UpdateSettingsText();
 					}
 					ExplorerAccessPtr->unlock();
 				}

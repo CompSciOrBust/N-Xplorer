@@ -6,6 +6,7 @@ class SettingsUI : public UIWindow
 	void LoadTheme();
 	//vars
 	SimpleList SettingsList;
+	std::string ThemeName = "";
 	public:
 	//functions
 	SettingsUI();
@@ -14,6 +15,6 @@ class SettingsUI : public UIWindow
 	//vars
 	ExplorerUI *Explorer;
 	MenuUI *ContextMenu;
-	void UpdateSortSettingText();
+	void UpdateSettingsText();
 	void CreateNewIni();
 };
