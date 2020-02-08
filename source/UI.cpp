@@ -26,6 +26,12 @@ class ScrollList
 	int ListColourSelected_R = 161;
 	int ListColourSelected_G = 161;
 	int ListColourSelected_B = 161;
+	int BorderColour_R = 0;
+	int BorderColour_G = 0;
+	int BorderColour_B = 0;
+	int TextColour_R = 255;
+	int TextColour_G = 255;
+	int TextColour_B = 255;
 	int ListingsOnScreen = 0;
 	int *TouchListX = NULL;
 	int *TouchListY = NULL;
@@ -130,7 +136,7 @@ void ScrollList::DrawList()
 		SDL_RenderFillRect(Renderer, &MenuItem);
 		
 		//Draw file names
-		SDL_Color TextColour = {255, 255, 255};
+		SDL_Color TextColour = {TextColour_R, TextColour_G, TextColour_B};
 		SDL_Surface* FileNameSurface = TTF_RenderUTF8_Blended(ListFont, ListingTextVec.at(i + *PListRenderOffset).c_str(), TextColour);
 		SDL_Texture* FileNameTexture = SDL_CreateTextureFromSurface(Renderer, FileNameSurface);
 		//Calculate text X and Y Coords
@@ -148,7 +154,7 @@ void ScrollList::DrawList()
 		SDL_RenderCopy(Renderer, FileNameTexture, NULL, &AmiiboNameRect);
 		
 		//Draw borders
-		SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(Renderer, BorderColour_R, BorderColour_G, BorderColour_B, 255);
 		SDL_Rect BorderRect = {ListXOffset, ListYOffset + (i * ListingHeight) - 1, ListWidth, BorderSize};
 		SDL_RenderFillRect(Renderer, &BorderRect);
 		//Check if we need to draw one more border

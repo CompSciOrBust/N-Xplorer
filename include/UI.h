@@ -36,6 +36,12 @@ class ScrollList
 	int ListColourSelected_R = 161;
 	int ListColourSelected_G = 161;
 	int ListColourSelected_B = 161;
+	int BorderColour_R = 0;
+	int BorderColour_G = 0;
+	int BorderColour_B = 0;
+	int TextColour_R = 255;
+	int TextColour_G = 255;
+	int TextColour_B = 255;
 	int ListingsOnScreen = 0;
 	int *TouchListX = NULL;
 	int *TouchListY = NULL;

@@ -128,6 +128,7 @@ int main(int argc, char* argv[])
 	SettingsMenu->Event = &Event;
 	SettingsMenu->WindowState = WindowStatePtr;
 	SettingsMenu->Explorer = Explorer;
+	SettingsMenu->ContextMenu = Menu;
 	
 	//Load the settings and create ini on first start up
 	SettingsMenu->CreateNewIni();

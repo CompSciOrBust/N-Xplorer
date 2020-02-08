@@ -3,6 +3,7 @@ class SettingsUI : public UIWindow
 	private:
 	//functions
 	void SaveINI();
+	void LoadTheme();
 	//vars
 	SimpleList SettingsList;
 	public:
@@ -12,6 +13,7 @@ class SettingsUI : public UIWindow
 	void GetInput();
 	//vars
 	ExplorerUI *Explorer;
+	MenuUI *ContextMenu;
 	void UpdateSortSettingText();
 	void CreateNewIni();
 };

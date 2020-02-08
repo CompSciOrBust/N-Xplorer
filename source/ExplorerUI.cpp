@@ -28,6 +28,21 @@ class ExplorerUI : public UIWindow
 	std::string *ChosenFile;
 	std::string DirPath = "mount:/";
 	int FileSortMode = 0;
+	int HeaderColour_R = 94;
+	int HeaderColour_G = 94;
+	int HeaderColour_B = 94;
+	int HeaderTextColour_R = 255;
+	int HeaderTextColour_G = 255;
+	int HeaderTextColour_B = 255;
+	int FooterColour_R = 94;
+	int FooterColour_G = 94;
+	int FooterColour_B = 94;
+	int FooterTextColour_R = 255;
+	int FooterTextColour_G = 255;
+	int FooterTextColour_B = 255;
+	int BGColour_R = 44;
+	int BGColour_G = 44;
+	int BGColour_B = 44;
 	//functions
 	ExplorerUI();
 	void GetInput();
@@ -221,7 +236,7 @@ void ExplorerUI::GoToIndexOfFile(string FileName)
 void ExplorerUI::DrawUI()
 {
 	//Draw the BG
-	SDL_SetRenderDrawColor(Renderer, 44, 44, 44, 255);
+	SDL_SetRenderDrawColor(Renderer, BGColour_R, BGColour_G, BGColour_B, 255);
 	SDL_Rect BGRect = {0,0, Width, Height};
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the header
@@ -238,11 +253,11 @@ void ExplorerUI::DrawUI()
 void ExplorerUI::DrawHeader()
 {
 	//Draw rect
-	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_SetRenderDrawColor(Renderer, HeaderColour_R, HeaderColour_G, HeaderColour_B, 255);
 	SDL_Rect HeaderRect = {0,0, Width, HeaderHeight};
 	SDL_RenderFillRect(Renderer, &HeaderRect);
 	//Vars for the text
-	SDL_Color TextColour = {255, 255, 255};
+	SDL_Color TextColour = {HeaderTextColour_R, HeaderTextColour_G, HeaderTextColour_B};
 	//Draw the title
 	SDL_Surface* TitleTextSurface = TTF_RenderText_Blended_Wrapped(HeaderFooterFont, " N-Xplorer", TextColour, Width);
 	SDL_Texture* TitleTextTexture = SDL_CreateTextureFromSurface(Renderer, TitleTextSurface);
@@ -270,11 +285,11 @@ void ExplorerUI::DrawHeader()
 void ExplorerUI::DrawFooter()
 {
 	//Draw rect
-	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_SetRenderDrawColor(Renderer, FooterColour_R, FooterColour_G, FooterColour_B, 255);
 	SDL_Rect FooterRect = {0, Height - FooterHeight, Width, FooterHeight};
 	SDL_RenderFillRect(Renderer, &FooterRect);
 	//Vars for the text
-	SDL_Color TextColour = {255, 255, 255};
+	SDL_Color TextColour = {FooterTextColour_R, FooterTextColour_G, FooterTextColour_B};
 	//Draw the path
 	//char dbg[256];
 	//sprintf(dbg, "Render offset: %d CursorIndex: %d SelectedIndex: %d", *FileSizeList->PListRenderOffset, *FileSizeList->PCursorIndex, *FileSizeList->PSelectedIndex);

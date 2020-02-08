@@ -21,6 +21,21 @@ class ExplorerUI : public UIWindow
 	std::string *ChosenFile;
 	std::string DirPath = "mount:/";
 	int FileSortMode = 0;
+	int HeaderColour_R = 94;
+	int HeaderColour_G = 94;
+	int HeaderColour_B = 94;
+	int HeaderTextColour_R = 255;
+	int HeaderTextColour_G = 255;
+	int HeaderTextColour_B = 255;
+	int FooterColour_R = 94;
+	int FooterColour_G = 94;
+	int FooterColour_B = 94;
+	int FooterTextColour_R = 255;
+	int FooterTextColour_G = 255;
+	int FooterTextColour_B = 255;
+	int BGColour_R = 44;
+	int BGColour_G = 44;
+	int BGColour_B = 44;
 	//functions
 	ExplorerUI();
 	void GetInput();
