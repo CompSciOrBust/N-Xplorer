@@ -168,6 +168,7 @@ ifeq ($(wildcard $(CURDIR)/SimpleIniParser/LICENSE),)
     @$(error "Please run 'git submodule update --init' before running 'make'")
 endif
 	@[ -d $@ ] || mkdir -p $@
+	@$(MAKE) -C SimpleIniParser
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 #---------------------------------------------------------------------------------
 clean:

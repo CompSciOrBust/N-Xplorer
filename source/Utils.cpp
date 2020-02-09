@@ -171,11 +171,36 @@ void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string
 	//If file just copy it
 	else if(CheckFileExists(SourcePath.c_str()))
 	{
-		//Stolen from https://stackoverflow.com/a/10195497 because <filesystem> is broken with the toolchain
+		//get the full path of the destination file
 		std::string PathToCopyTo = DestPath + "/" + FileName;
-		std::ifstream src(SourcePath.c_str(), std::ios::binary);
-		std::ofstream dst(PathToCopyTo.c_str(), std::ios::binary);
-		dst << src.rdbuf();
+		//Get files as streams
+		std::ifstream SourceFile (SourcePath, std::ifstream::binary);
+		std::ofstream DestFile (PathToCopyTo, std::ofstream::binary);
+		//Get file size
+		SourceFile.seekg (0,SourceFile.end);
+		long size = SourceFile.tellg();
+		SourceFile.seekg (0);
+		//Create a 0.25 gb buffer
+		int Chunksize = 1024 * 1024 * 256;
+		char* Buffer = new char[Chunksize];
+		//If the file is smaller than the buffer change the chunk size
+		if(size < Chunksize) Chunksize = size;
+		//Calculate how much of the file will be left over when split in to chunks
+		int LeftOvers = size % Chunksize;
+		while(SourceFile.tellg() != size - LeftOvers)
+		{
+			//Copy the source in to the buffer
+			SourceFile.read(Buffer,Chunksize);
+			//Writet he buffer in to the destination file
+			DestFile.write(Buffer,Chunksize);
+		}
+		//Copy the left over bytes that didn't fit evenly in to a buffer
+		SourceFile.read(Buffer,LeftOvers);
+		DestFile.write(Buffer,LeftOvers);
+		//Clean up
+		delete[] Buffer;
+		DestFile.close();
+		SourceFile.close();
 	}
 }
 
