@@ -176,6 +176,7 @@ void SettingsUI::SaveINI()
 void SettingsUI::LoadTheme()
 {
 	//Vars
+	//Main UI
 	//File list
 	int FileListColour_R = 66;
 	int FileListColour_G = 66;
@@ -189,19 +190,7 @@ void SettingsUI::LoadTheme()
 	int FileListTextColour_R = 255;
 	int FileListTextColour_G = 255;
 	int FileListTextColour_B = 255;
-	//Context menu
-	int ContextColour_R = 66;
-	int ContextColour_G = 66;
-	int ContextColour_B = 66;
-	int ContextColourSelected_R = 161;
-	int ContextColourSelected_G = 161;
-	int ContextColourSelected_B = 161;
-	int ContextBorderColour_R = 0;
-	int ContextBorderColour_G = 0;
-	int ContextBorderColour_B = 0;
-	int ContextTextColour_R = 255;
-	int ContextTextColour_G = 255;
-	int ContextTextColour_B = 255;
+
 	//Header and footer
 	int HeaderColour_R = 94;
 	int HeaderColour_G = 94;
@@ -221,11 +210,37 @@ void SettingsUI::LoadTheme()
 	int BGColour_B = 44;
 	//TODO: Support images
 	
+	//Misc UI
+	//Context menu
+	int ContextColour_R = 66;
+	int ContextColour_G = 66;
+	int ContextColour_B = 66;
+	int ContextColourSelected_R = 161;
+	int ContextColourSelected_G = 161;
+	int ContextColourSelected_B = 161;
+	int ContextBorderColour_R = 0;
+	int ContextBorderColour_G = 0;
+	int ContextBorderColour_B = 0;
+	int ContextTextColour_R = 255;
+	int ContextTextColour_G = 255;
+	int ContextTextColour_B = 255;
+	//Long op message
+	int LongOpMessageBorder_R = 0;
+	int LongOpMessageBorder_G = 0;
+	int LongOpMessageBorder_B = 0;
+	int LongOpMessageBG_R = 94;
+	int LongOpMessageBG_G = 94;
+	int LongOpMessageBG_B = 94;
+	int LongOpMessageTextColour_R = 255;
+	int LongOpMessageTextColour_G = 255;
+	int LongOpMessageTextColour_B = 255;
+	
 	//Read the ini
 	std::string ThemeLocation = "sdmc:/config/N-Xplorer/Themes/" + ThemeName + "/Theme.ini";
 	Ini * ThemeIni;
 	if(CheckFileExists(ThemeLocation)) ThemeIni = Ini::parseFile(ThemeLocation);
 	else ThemeIni = new Ini;
+	//Main UI
 	IniSection * ThemeColourSection = ThemeIni->findOrCreateSection("MainUI Colours", false);
 	//File names
 	FileListColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("FileListColour_R", std::to_string(FileListColour_R), false)->value);
@@ -240,19 +255,6 @@ void SettingsUI::LoadTheme()
 	FileListTextColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("FileListTextColour_R", std::to_string(FileListTextColour_R), false)->value);
 	FileListTextColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("FileListTextColour_G", std::to_string(FileListTextColour_G), false)->value);
 	FileListTextColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("FileListTextColour_B", std::to_string(FileListTextColour_B), false)->value);
-	//Context menu
-	ContextColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColour_R", std::to_string(ContextColour_R), false)->value);
-	ContextColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColour_G", std::to_string(ContextColour_G), false)->value);
-	ContextColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColour_B", std::to_string(ContextColour_B), false)->value);
-	ContextColourSelected_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourSelected_R", std::to_string(ContextColourSelected_R), false)->value);
-	ContextColourSelected_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourSelected_G", std::to_string(ContextColourSelected_G), false)->value);
-	ContextColourSelected_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextColourSelected_B", std::to_string(ContextColourSelected_B), false)->value);
-	ContextBorderColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextBorderColour_R", std::to_string(ContextBorderColour_R), false)->value);
-	ContextBorderColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextBorderColour_G", std::to_string(ContextBorderColour_G), false)->value);
-	ContextBorderColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextBorderColour_B", std::to_string(ContextBorderColour_B), false)->value);
-	ContextTextColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextTextColour_R", std::to_string(ContextTextColour_R), false)->value);
-	ContextTextColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextTextColour_G", std::to_string(ContextTextColour_G), false)->value);
-	ContextTextColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("ContextTextColour_B", std::to_string(ContextTextColour_B), false)->value);
 	//Header and footer
 	HeaderColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("HeaderColour_R", std::to_string(HeaderColour_R), false)->value);
 	HeaderColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("HeaderColour_G", std::to_string(HeaderColour_G), false)->value);
@@ -270,13 +272,42 @@ void SettingsUI::LoadTheme()
 	BGColour_R = std::stoi(ThemeColourSection->findOrCreateFirstOption("BGColour_R", std::to_string(BGColour_R), false)->value);
 	BGColour_G = std::stoi(ThemeColourSection->findOrCreateFirstOption("BGColour_G", std::to_string(BGColour_G), false)->value);
 	BGColour_B = std::stoi(ThemeColourSection->findOrCreateFirstOption("BGColour_B", std::to_string(BGColour_B), false)->value);
+	
+	//Misc colours
+	IniSection * ThemeMiscColourSection = ThemeIni->findOrCreateSection("SubUI Colours", false);
+	//Context menu
+	ContextColour_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextColour_R", std::to_string(ContextColour_R), false)->value);
+	ContextColour_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextColour_G", std::to_string(ContextColour_G), false)->value);
+	ContextColour_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextColour_B", std::to_string(ContextColour_B), false)->value);
+	ContextColourSelected_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextColourSelected_R", std::to_string(ContextColourSelected_R), false)->value);
+	ContextColourSelected_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextColourSelected_G", std::to_string(ContextColourSelected_G), false)->value);
+	ContextColourSelected_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextColourSelected_B", std::to_string(ContextColourSelected_B), false)->value);
+	ContextBorderColour_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextBorderColour_R", std::to_string(ContextBorderColour_R), false)->value);
+	ContextBorderColour_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextBorderColour_G", std::to_string(ContextBorderColour_G), false)->value);
+	ContextBorderColour_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextBorderColour_B", std::to_string(ContextBorderColour_B), false)->value);
+	ContextTextColour_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextTextColour_R", std::to_string(ContextTextColour_R), false)->value);
+	ContextTextColour_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextTextColour_G", std::to_string(ContextTextColour_G), false)->value);
+	ContextTextColour_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("ContextTextColour_B", std::to_string(ContextTextColour_B), false)->value);
+	//long op message
+	LongOpMessageBorder_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageBorder_R", std::to_string(LongOpMessageBorder_R), false)->value);
+	LongOpMessageBorder_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageBorder_G", std::to_string(LongOpMessageBorder_G), false)->value);
+	LongOpMessageBorder_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageBorder_B", std::to_string(LongOpMessageBorder_B), false)->value);
+	LongOpMessageBG_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageBG_R", std::to_string(LongOpMessageBG_R), false)->value);
+	LongOpMessageBG_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageBG_G", std::to_string(LongOpMessageBG_G), false)->value);
+	LongOpMessageBG_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageBG_B", std::to_string(LongOpMessageBG_B), false)->value);
+	LongOpMessageTextColour_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageTextColour_R", std::to_string(LongOpMessageTextColour_R), false)->value);
+	LongOpMessageTextColour_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageTextColour_G", std::to_string(LongOpMessageTextColour_G), false)->value);
+	LongOpMessageTextColour_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageTextColour_B", std::to_string(LongOpMessageTextColour_B), false)->value);
+	
 	//Save the theme with entries for backwards compatability
 	std::string ThemeFolder = "sdmc:/config/N-Xplorer/Themes/" + ThemeName;
 	mkdir("sdmc:/config/N-Xplorer/Themes/", 0);
 	mkdir(ThemeFolder.c_str(), 0);
 	ThemeIni->writeToFile(ThemeLocation);
 	delete ThemeIni;
+	
 	//update the vars
+	//Main UI
 	//File names
 	Explorer->FileNameList->ListColour_R = FileListColour_R;
 	Explorer->FileNameList->ListColour_G = FileListColour_G;
@@ -333,4 +364,16 @@ void SettingsUI::LoadTheme()
 	Explorer->BGColour_R = BGColour_R;
 	Explorer->BGColour_G = BGColour_G;
 	Explorer->BGColour_B = BGColour_B;
+	
+	//MiscUI
+	//Long op message
+	ContextMenu->LongOpMessageBorder_R = LongOpMessageBorder_R;
+	ContextMenu->LongOpMessageBorder_G = LongOpMessageBorder_G;
+	ContextMenu->LongOpMessageBorder_B = LongOpMessageBorder_B;
+	ContextMenu->LongOpMessageBG_R = LongOpMessageBG_R;
+	ContextMenu->LongOpMessageBG_G = LongOpMessageBG_G;
+	ContextMenu->LongOpMessageBG_B = LongOpMessageBG_B;
+	ContextMenu->LongOpMessageTextColour_R = LongOpMessageTextColour_R;
+	ContextMenu->LongOpMessageTextColour_G = LongOpMessageTextColour_G;
+	ContextMenu->LongOpMessageTextColour_B = LongOpMessageTextColour_B;
 }

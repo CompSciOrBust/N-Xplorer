@@ -173,6 +173,7 @@ void ExplorerUI::GetInput()
 							{
 								printf("%s\n", DirPath.c_str());
 								u64 AppID = SaveMountMap[DirPath];
+								DirPath = "Save";
 								printf("%lu\n", AppID);
 								fsdevMountSaveData(DirPath.c_str(), AppID, CurrentUuid);
 								DirPath += ":/";
@@ -222,7 +223,9 @@ void ExplorerUI::GetInput()
 						  {
 							  if(CurrentMount != "" && CurrentMount != ClipBoardMount)
 							  {
+								  fsdevCommitDevice(CurrentMount.c_str());
 								  fsdevUnmountDevice(CurrentMount.c_str());
+								  CurrentMount = "";
 							  }
 						  }
 					  }
@@ -385,13 +388,6 @@ std::vector <std::string> ExplorerUI::GetSaveDataMounts()
 			nsGetApplicationControlData(NsApplicationControlSource_Storage, saveDataInfo.application_id, buf.get(), sizeof(NsApplicationControlData), nullptr);
 			nacpGetLanguageEntry(&buf->nacp, &langentry);
 			std::string AppName = std::string(langentry->name);
-			//Remove colons because it messes with paths
-			int ColonPos = AppName.find_first_of(":");
-			while (ColonPos != std::string::npos)
-			{
-				AppName[ColonPos]=' ';
-				ColonPos = AppName.find_first_of(":",ColonPos+1);
-			}
 			//Add the app ID and the name to vectors for use later
 			AppMounts.push_back(AppName);
 			SaveMountMap.insert({AppName, saveDataInfo.application_id});
@@ -448,6 +444,15 @@ class MenuUI : public UIWindow
 	//vars
 	ScrollList *MenuList;
 	ExplorerUI *Explorer;
+	int LongOpMessageBorder_R = 0;
+	int LongOpMessageBorder_G = 0;
+	int LongOpMessageBorder_B = 0;
+	int LongOpMessageBG_R = 94;
+	int LongOpMessageBG_G = 94;
+	int LongOpMessageBG_B = 94;
+	int LongOpMessageTextColour_R = 255;
+	int LongOpMessageTextColour_G = 255;
+	int LongOpMessageTextColour_B = 255;
 	//Functions
 	MenuUI();
 	void GetInput();
@@ -492,7 +497,7 @@ void MenuUI::DrawUI()
 void MenuUI::DrawLongOpMessage()
 {
 	//Draw the outline
-	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(Renderer, LongOpMessageBorder_R, LongOpMessageBorder_G, LongOpMessageBorder_B, 255);
 	int BGWidth = Width * 0.7;
 	int BGHeight = Height * 0.5;
 	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight};
@@ -501,10 +506,10 @@ void MenuUI::DrawLongOpMessage()
 	BGWidth -= 4;
 	BGHeight -= 4;
 	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight};
-	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_SetRenderDrawColor(Renderer, LongOpMessageBG_R, LongOpMessageBG_G, LongOpMessageBG_B, 255);
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the message text
-	SDL_Color TextColour = {255, 255, 255};
+	SDL_Color TextColour = {LongOpMessageTextColour_R, LongOpMessageTextColour_G, LongOpMessageTextColour_B};
 	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(MenuList->ListFont, LongOpMessage.c_str(), TextColour, BGWidth);
 	SDL_Texture* MessageTextTexture = SDL_CreateTextureFromSurface(Renderer, MessageTextSurface);
 	SDL_Rect MessageTextRect = {BGRect.x + (BGWidth - MessageTextSurface->w) / 2, BGRect.y + (BGHeight - MessageTextSurface->h) / 2, MessageTextSurface->w, MessageTextSurface->h};
@@ -563,7 +568,11 @@ void MenuUI::GetInput()
 								{
 									ClipboardPath = Explorer->HighlightedPath.c_str();
 									ClipboardFileName = Explorer->FileNameList->ListingTextVec.at(Explorer->FileNameList->SelectedIndex);
-									if(Explorer->CurrentMount != Explorer->ClipBoardMount) fsdevUnmountDevice(Explorer->ClipBoardMount.c_str());
+									if(Explorer->CurrentMount != Explorer->ClipBoardMount)
+									{
+										fsdevCommitDevice(Explorer->ClipBoardMount.c_str());
+										fsdevUnmountDevice(Explorer->ClipBoardMount.c_str());
+									}
 									Explorer->ClipBoardMount = Explorer->CurrentMount;
 								}
 							}

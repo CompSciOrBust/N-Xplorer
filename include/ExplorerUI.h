@@ -69,6 +69,15 @@ class MenuUI : public UIWindow
 	//vars
 	ScrollList *MenuList;
 	ExplorerUI *Explorer;
+	int LongOpMessageBorder_R = 0;
+	int LongOpMessageBorder_G = 0;
+	int LongOpMessageBorder_B = 0;
+	int LongOpMessageBG_R = 94;
+	int LongOpMessageBG_G = 94;
+	int LongOpMessageBG_B = 94;
+	int LongOpMessageTextColour_R = 255;
+	int LongOpMessageTextColour_G = 255;
+	int LongOpMessageTextColour_B = 255;
 	//Functions
 	MenuUI();
 	void GetInput();
