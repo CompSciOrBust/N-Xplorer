@@ -71,6 +71,8 @@ int main(int argc, char* argv[])
 	
 	TTF_Init(); //Init the font
 	plInitialize(); //Init needed for shared font
+	nsInitialize(); //Init ns service for game save mounting
+	accountInitialize(AccountServiceType_Application); //Init the account service. Needed for getting the user ID.
 	
 	//Mount the file systems
 	//user
@@ -291,6 +293,8 @@ int main(int argc, char* argv[])
 	//Clean up
 	socketExit();
 	plExit();
+	nsExit();
+	accountExit();
 	SDL_DestroyRenderer(Renderer);
 	SDL_DestroyWindow(Window);
 	SDL_Quit();

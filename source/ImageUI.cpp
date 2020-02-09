@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include <sdl_image.h>
+#include <SDL_image.h>
 #include <iostream>
 #include <UI.h>
 #include <unistd.h>

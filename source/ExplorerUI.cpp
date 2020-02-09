@@ -9,6 +9,7 @@
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
 #include <mutex>
+#include <unordered_map>
 using namespace std;
 
 class ExplorerUI : public UIWindow
@@ -19,14 +20,21 @@ class ExplorerUI : public UIWindow
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
 	std::mutex ListAccesMutex;
+	std::vector <std::string> SaveMounts = std::vector <std::string>(0);
+	std::unordered_map <std::string, u64> SaveMountMap = std::unordered_map <std::string, u64>(0);
+	AccountUid CurrentUuid;
+	//functions
+	std::vector <std::string> GetSaveDataMounts();
 	public:
 	//vars
 	ScrollList *FileNameList;
 	ScrollList *FileSizeList;
-	vector <dirent> Files = vector <dirent>(0);
+	std::vector <dirent> Files = std::vector <dirent>(0);
 	std::string HighlightedPath = "";
 	std::string *ChosenFile;
 	std::string DirPath = "mount:/";
+	std::string CurrentMount;
+	std::string ClipBoardMount;
 	int FileSortMode = 0;
 	int HeaderColour_R = 94;
 	int HeaderColour_G = 94;
@@ -85,7 +93,9 @@ ExplorerUI::ExplorerUI()
 	FileSizeList->ListXOffset = FileNameList->ListWidth;
 	FileSizeList->CenterText = true;
 	FileSizeList->IsActive = true;
-	//Populate lists
+	//Populate listsand set up save data mounting
+	accountGetPreselectedUser(&CurrentUuid);
+	SaveMounts = GetSaveDataMounts();
 	LoadListDirs(DirPath);
 	HeaderFooterFont = GetSharedFont(40);
 }
@@ -159,6 +169,16 @@ void ExplorerUI::GetInput()
 								//Reset the cursor
 								FileNameList->ResetPos();
 							}
+							else if(FileSizeList->ListingTextVec.at(FileNameList->SelectedIndex) == "SAVE")
+							{
+								printf("%s\n", DirPath.c_str());
+								u64 AppID = SaveMountMap[DirPath];
+								printf("%lu\n", AppID);
+								fsdevMountSaveData(DirPath.c_str(), AppID, CurrentUuid);
+								DirPath += ":/";
+								LoadListDirs(DirPath);
+								CurrentMount = DirPath;
+							}
 							else if(GetParentalControl())
 							{
 								LoadListDirs(DirPath);
@@ -197,6 +217,14 @@ void ExplorerUI::GetInput()
 						  FileNameList->ResetPos();
 						  if(DirPath != "mount:/") FileToGoTo.erase(FileToGoTo.size()-1, FileToGoTo.size());
 						  GoToIndexOfFile(FileToGoTo);
+						  //Unmount save file
+						  if(DirPath == "mount:/")
+						  {
+							  if(CurrentMount != "" && CurrentMount != ClipBoardMount)
+							  {
+								  fsdevUnmountDevice(CurrentMount.c_str());
+							  }
+						  }
 					  }
 				  }
 			  }
@@ -337,6 +365,42 @@ void ExplorerUI::OpenFile(string Path)
 	}
 }
 
+std::vector <std::string> ExplorerUI::GetSaveDataMounts()
+{
+	//Modified code provided by WerWolv
+	FsSaveDataInfoReader reader;
+	FsSaveDataInfo saveDataInfo;
+	s64 totalSaveEntries = 0;
+	std::vector <std::string> AppMounts;
+	fsOpenSaveDataInfoReader(&reader, FsSaveDataSpaceId_User);
+	do
+	{
+		fsSaveDataInfoReaderRead(&reader, &saveDataInfo, 1, &totalSaveEntries);
+		if (saveDataInfo.save_data_type == FsSaveDataType_Account)
+		{
+			//Get the app name. This is unsafe but probably won't fail.
+			NacpLanguageEntry *langentry = nullptr;
+			std::unique_ptr<NsApplicationControlData> buf = std::make_unique<NsApplicationControlData>();
+			memset(buf.get(), 0, sizeof(NsApplicationControlData));
+			nsGetApplicationControlData(NsApplicationControlSource_Storage, saveDataInfo.application_id, buf.get(), sizeof(NsApplicationControlData), nullptr);
+			nacpGetLanguageEntry(&buf->nacp, &langentry);
+			std::string AppName = std::string(langentry->name);
+			//Remove colons because it messes with paths
+			int ColonPos = AppName.find_first_of(":");
+			while (ColonPos != std::string::npos)
+			{
+				AppName[ColonPos]=' ';
+				ColonPos = AppName.find_first_of(":",ColonPos+1);
+			}
+			//Add the app ID and the name to vectors for use later
+			AppMounts.push_back(AppName);
+			SaveMountMap.insert({AppName, saveDataInfo.application_id});
+		}
+	} while(totalSaveEntries > 0);
+	fsSaveDataInfoReaderClose(&reader);
+	return AppMounts;
+}
+
 void ExplorerUI::LoadListDirs(string DirPath)
 {
 	ListAccesMutex.lock();
@@ -352,6 +416,11 @@ void ExplorerUI::LoadListDirs(string DirPath)
 		FileSizeList->ListingTextVec.push_back("NAND");
 		FileNameList->ListingTextVec.push_back("sys:/");
 		FileSizeList->ListingTextVec.push_back("NAND");
+		for(int i = 0; i < SaveMounts.size(); i++)
+		{
+			FileNameList->ListingTextVec.push_back(SaveMounts.at(i));
+			FileSizeList->ListingTextVec.push_back("SAVE");
+		}
 	}
 	else
 	{
@@ -494,6 +563,8 @@ void MenuUI::GetInput()
 								{
 									ClipboardPath = Explorer->HighlightedPath.c_str();
 									ClipboardFileName = Explorer->FileNameList->ListingTextVec.at(Explorer->FileNameList->SelectedIndex);
+									if(Explorer->CurrentMount != Explorer->ClipBoardMount) fsdevUnmountDevice(Explorer->ClipBoardMount.c_str());
+									Explorer->ClipBoardMount = Explorer->CurrentMount;
 								}
 							}
 							break;

@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <thread>
 #include <mutex>
+#include <unordered_map>
 class ExplorerUI : public UIWindow
 {
 	private:
@@ -12,14 +13,21 @@ class ExplorerUI : public UIWindow
 	int FooterHeight = 50;
 	TTF_Font *HeaderFooterFont;
 	std::mutex ListAccesMutex;
+	std::vector <std::string> SaveMounts = std::vector <std::string>(0);
+	std::unordered_map <std::string, u64> SaveMountMap = std::unordered_map <std::string, u64>(0);
+	AccountUid CurrentUuid;
+	//functions
+	std::vector <std::string> GetSaveDataMounts();
 	public:
 	//vars
 	ScrollList *FileNameList;
 	ScrollList *FileSizeList;
-	vector <dirent> Files = vector <dirent>(0);
+	std::vector <dirent> Files = std::vector <dirent>(0);
 	std::string HighlightedPath = "";
 	std::string *ChosenFile;
 	std::string DirPath = "mount:/";
+	std::string CurrentMount;
+	std::string ClipBoardMount;
 	int FileSortMode = 0;
 	int HeaderColour_R = 94;
 	int HeaderColour_G = 94;
