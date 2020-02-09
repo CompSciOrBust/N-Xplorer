@@ -104,6 +104,7 @@ int main(int argc, char* argv[])
 	Menu->WindowState = WindowStatePtr;
 	Menu->MenuList->Renderer = Renderer;
 	Menu->Explorer = Explorer;
+	Explorer->LongOpMessagePtr = &Menu->LongOpMessage;
 	
 	//Init text editor
 	TextUI *TextEditor = new TextUI();

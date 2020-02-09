@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>
 #include <unordered_map>
+
 class ExplorerUI : public UIWindow
 {
 	private:
@@ -28,6 +29,7 @@ class ExplorerUI : public UIWindow
 	std::string DirPath = "mount:/";
 	std::string CurrentMount;
 	std::string ClipBoardMount;
+	std::string *LongOpMessagePtr;
 	int FileSortMode = 0;
 	int HeaderColour_R = 94;
 	int HeaderColour_G = 94;
@@ -62,7 +64,6 @@ class MenuUI : public UIWindow
 	//vars
 	std::string ClipboardPath = "";
 	std::string ClipboardFileName = "";
-	std::string LongOpMessage = "";
 	//functions
 	void RecFileCopy();
 	public:
@@ -78,6 +79,7 @@ class MenuUI : public UIWindow
 	int LongOpMessageTextColour_R = 255;
 	int LongOpMessageTextColour_G = 255;
 	int LongOpMessageTextColour_B = 255;
+	std::string LongOpMessage = "Unset";
 	//Functions
 	MenuUI();
 	void GetInput();

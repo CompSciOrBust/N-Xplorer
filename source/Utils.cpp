@@ -7,6 +7,7 @@
 #include <switch.h>
 #include <fstream>
 #include <algorithm>
+#include <minizip/unzip.h>
 
 std::vector <dirent> SortFiles(std::string Path, std::vector <dirent> FilesVec, int SortMode)
 {
@@ -234,4 +235,46 @@ bool GetParentalControl()
 	{
 		return true;
 	}
+}
+
+//Based on https://github.com/ITotalJustice/atmosphere-updater/blob/master/source/unzip.c
+void UnzipFile(std::string FileLocation, std::string LocationToUnzipTo)
+{
+	unzFile ZipFile = unzOpen(FileLocation.c_str());
+	//Get info about the zip
+	unz_global_info ZipInfo;
+	unzGetGlobalInfo(ZipFile, &ZipInfo);
+	//Loop through every file
+	for(int i = 0; i < ZipInfo.number_entry; i++)
+	{
+		char FileNameInZip[256];
+		unz_file_info FileInfo;
+		unzOpenCurrentFile(ZipFile);
+		unzGetCurrentFileInfo(ZipFile, &FileInfo, FileNameInZip, sizeof(FileNameInZip), NULL, 0, NULL, 0);
+		//Check if a dir
+		if ((FileNameInZip[strlen(FileNameInZip) - 1]) == '/')
+		{
+			std::string DirPa = LocationToUnzipTo.c_str();
+			DirPa += FileNameInZip;
+			mkdir(DirPa.c_str(), 0);
+		}
+		else
+		{
+			const char *write_filename = FileNameInZip;
+			void *buf = malloc(500000);
+			FILE *outfile;
+			std::string FilePathOfFile = LocationToUnzipTo.c_str();
+			FilePathOfFile += write_filename;
+			outfile = fopen(FilePathOfFile.c_str(), "wb");
+			for (int j = unzReadCurrentFile(ZipFile, buf, 500000); j > 0; j = unzReadCurrentFile(ZipFile, buf, 500000))
+			{
+				fwrite(buf, 1, j, outfile);
+			}
+			fclose(outfile);
+			free(buf);
+		}
+		unzCloseCurrentFile(ZipFile);
+		unzGoToNextFile(ZipFile);
+	}
+	unzClose(ZipFile);
 }

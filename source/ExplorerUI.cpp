@@ -35,6 +35,7 @@ class ExplorerUI : public UIWindow
 	std::string DirPath = "mount:/";
 	std::string CurrentMount;
 	std::string ClipBoardMount;
+	std::string *LongOpMessagePtr;
 	int FileSortMode = 0;
 	int HeaderColour_R = 94;
 	int HeaderColour_G = 94;
@@ -366,6 +367,14 @@ void ExplorerUI::OpenFile(string Path)
 		//*WindowState = 4;
 		*ChosenFile = Path;
 	}
+	else if(FileSuffix == "zip")
+	{
+		*WindowState = 4;
+		*LongOpMessagePtr = "Unzipping " + FileNameList->ListingTextVec.at(FileNameList->SelectedIndex) + ". please wait!";
+		UnzipFile(Path, DirPath);
+		*WindowState = 0;
+		LoadListDirs(DirPath);
+	}
 }
 
 std::vector <std::string> ExplorerUI::GetSaveDataMounts()
@@ -437,7 +446,6 @@ class MenuUI : public UIWindow
 	//vars
 	std::string ClipboardPath = "";
 	std::string ClipboardFileName = "";
-	std::string LongOpMessage = "";
 	//functions
 	void RecFileCopy();
 	public:
@@ -453,6 +461,7 @@ class MenuUI : public UIWindow
 	int LongOpMessageTextColour_R = 255;
 	int LongOpMessageTextColour_G = 255;
 	int LongOpMessageTextColour_B = 255;
+	std::string LongOpMessage = "Unset";
 	//Functions
 	MenuUI();
 	void GetInput();
