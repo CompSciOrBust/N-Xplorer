@@ -89,11 +89,13 @@ void UpdaterUI::GetInput()
 				string UpdateFileURL = "https://github.com/CompSciOrBust/N-Xplorer/releases/download/" + LatestID + "/N-Xplorer.zip";
 				RetrieveToFile(UpdateFileURL, "sdmc:/config/N-Xplorer/update.zip");
 				UnzipFile("sdmc:/config/N-Xplorer/update.zip", "sdmc:/");
+				Menu->LongOpMessage = "Extracting...";
 				if(NroPath != "sdmc:/switch/N-Xplorer.nro")
 				{
 					remove(NroPath.c_str());
 					rename("sdmc:/switch/N-Xplorer.nro", NroPath.c_str());
 				}
+				Menu->LongOpMessage = "Done!";
 				*IsDone = 1;
 			}
 			else
