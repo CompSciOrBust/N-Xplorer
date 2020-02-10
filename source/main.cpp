@@ -8,6 +8,7 @@
 #include <TextUI.h>
 #include <ImageUI.h>
 #include <Settings.h>
+#include <Updater.h>
 #include <thread>
 #include <mutex>
 
@@ -133,11 +134,19 @@ int main(int argc, char* argv[])
 	SettingsMenu->Explorer = Explorer;
 	SettingsMenu->ContextMenu = Menu;
 	
+	//Init the updater
+	UpdaterUI *Updater = new UpdaterUI();
+	Updater->Renderer = Renderer;
+	Updater->Event = &Event;
+	Updater->WindowState = WindowStatePtr;
+	Updater->Menu = Menu;
+	Updater->NroPath = argv[0];
+	
 	//Load the settings and create ini on first start up
 	SettingsMenu->CreateNewIni();
 	
 	//Input loop thread
-	std::thread InputLoopThread([DonePtr, WindowStatePtr, Explorer, Menu, TextEditor, ImageViewer, SettingsMenu, ExplorerAccessPtr, TextEditorAccessPtr, ImageViewerAccessPtr]()
+	std::thread InputLoopThread([DonePtr, WindowStatePtr, Explorer, Menu, TextEditor, ImageViewer, SettingsMenu, ExplorerAccessPtr, TextEditorAccessPtr, ImageViewerAccessPtr, Updater]()
 	{
 		while(!*DonePtr)
 		{
@@ -214,6 +223,21 @@ int main(int argc, char* argv[])
 					ExplorerAccessPtr->unlock();
 				}
 				break;
+				//Updater input
+				case 7:
+				{
+					Updater->GetInput();
+				}
+				break;
+				//Unzip logic
+				case 8:
+				{
+					*WindowStatePtr = 4;
+					UnzipFile(*Explorer->ChosenFile, Explorer->DirPath);
+					*WindowStatePtr = 0;
+					Explorer->LoadListDirs(Explorer->DirPath);
+				}
+				break;
 			}
 		}
 	});
@@ -282,6 +306,14 @@ int main(int argc, char* argv[])
 				Explorer->DrawUI();
 				SettingsMenu->DrawUI();
 				ExplorerAccess.unlock();
+			}
+			break;
+			//Draw the updater UI
+			case 7:
+			{
+				Explorer->DrawUI();
+				Updater->DrawUI();
+				Menu->DrawLongOpMessage();
 			}
 			break;
 		}

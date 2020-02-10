@@ -44,7 +44,7 @@ DATA		:=	data
 INCLUDES	:=	include
 APP_AUTHOR := CompSciOrBust
 #ROMFS	:=	romfs
-APP_VERSION := 0.6.4 Beta
+APP_VERSION := 0.7.0
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -54,7 +54,7 @@ ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
-CFLAGS	+=	-D__SWITCH__ $(INCLUDE) `sdl2-config --cflags`
+CFLAGS	+=	-D__SWITCH__ -DVERSION='"$(APP_VERSION)"' $(INCLUDE) `sdl2-config --cflags`
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
 
@@ -62,13 +62,13 @@ ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 #Stolen from https://github.com/devolution2409/NX-input-recorder/blob/master/Makefile#L63 because SDL_Mixer is hard
-LIBS := -lfreetype -lSDL2_mixer -lopusfile -lopus -lmodplug -lmpg123 -lvorbisidec -logg -lSDL2_ttf -lSDL2_gfx -lSDL2_image -lSDL2 -lEGL -lGLESv2 -lglapi -ldrm_nouveau -lwebp -lpng -ljpeg `sdl2-config --libs` `freetype-config --libs` -lnx -lSimpleIniParser -lminizip -lz
+LIBS := -lcurl -lz -lmbedtls -lmbedcrypto -lmbedx509 -lnx -lfreetype -lSDL2_mixer -lopusfile -lopus -lmodplug -lmpg123 -lvorbisidec -lc -logg -lSDL2_ttf -lSDL2_gfx -lSDL2_image -lwebp -lpng -ljpeg `sdl2-config --libs` `freetype-config --libs` -lSimpleIniParser -lminizip
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/SimpleIniParser
+LIBDIRS	:= $(PORTLIBS) $(LIBNX) $(CURDIR)/SimpleIniParser $(CURDIR)/json
 
 
 #---------------------------------------------------------------------------------

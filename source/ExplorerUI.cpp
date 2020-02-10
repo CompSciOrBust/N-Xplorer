@@ -369,11 +369,9 @@ void ExplorerUI::OpenFile(string Path)
 	}
 	else if(FileSuffix == "zip")
 	{
-		*WindowState = 4;
+		*ChosenFile = Path;
 		*LongOpMessagePtr = "Unzipping " + FileNameList->ListingTextVec.at(FileNameList->SelectedIndex) + ". please wait!";
-		UnzipFile(Path, DirPath);
-		*WindowState = 0;
-		LoadListDirs(DirPath);
+		*WindowState = 8;
 	}
 }
 
