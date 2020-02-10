@@ -93,8 +93,8 @@ void UpdaterUI::GetInput()
 				{
 					remove(NroPath.c_str());
 					rename("sdmc:/switch/N-Xplorer.nro", NroPath.c_str());
-					*IsDone = 1;
 				}
+				*IsDone = 1;
 			}
 			else
 			{
