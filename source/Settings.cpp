@@ -235,6 +235,23 @@ void SettingsUI::LoadTheme()
 	int LongOpMessageTextColour_G = 255;
 	int LongOpMessageTextColour_B = 255;
 	
+	//Settings menu
+	int SettingsListHeaderColour_R = 94;
+	int SettingsListHeaderColour_G = 94;
+	int SettingsListHeaderColour_B = 94;
+	int SettingsListColour_R = 66;
+	int SettingsListColour_G = 66;
+	int SettingsListColour_B = 66;
+	int SettingsListColourSelected_R = 161;
+	int SettingsListColourSelected_G = 161;
+	int SettingsListColourSelected_B = 161;
+	int SettingsBorderColour_R = 0;
+	int SettingsBorderColour_G = 0;
+	int SettingsBorderColour_B = 0;
+	int SettingsListTextColour_R = 255;
+	int SettingsListTextColour_G = 255;
+	int SettingsListTextColour_B = 255;
+	
 	//Read the ini
 	std::string ThemeLocation = "sdmc:/config/N-Xplorer/Themes/" + ThemeName + "/Theme.ini";
 	Ini * ThemeIni;
@@ -298,6 +315,24 @@ void SettingsUI::LoadTheme()
 	LongOpMessageTextColour_R = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageTextColour_R", std::to_string(LongOpMessageTextColour_R), false)->value);
 	LongOpMessageTextColour_G = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageTextColour_G", std::to_string(LongOpMessageTextColour_G), false)->value);
 	LongOpMessageTextColour_B = std::stoi(ThemeMiscColourSection->findOrCreateFirstOption("LongOpMessageTextColour_B", std::to_string(LongOpMessageTextColour_B), false)->value);
+	
+	//Settings list colours
+	IniSection * ThemeSettingsColourSection = ThemeIni->findOrCreateSection("SettingsUI Colours", false);
+	SettingsListHeaderColour_R = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListHeaderColour_R", std::to_string(SettingsListHeaderColour_R), false)->value);
+	SettingsListHeaderColour_G = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListHeaderColour_G", std::to_string(SettingsListHeaderColour_G), false)->value);
+	SettingsListHeaderColour_B = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListHeaderColour_B", std::to_string(SettingsListHeaderColour_B), false)->value);
+	SettingsListColour_R = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListColour_R", std::to_string(SettingsListColour_R), false)->value);
+	SettingsListColour_G = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListColour_G", std::to_string(SettingsListColour_G), false)->value);
+	SettingsListColour_B = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListColour_B", std::to_string(SettingsListColour_B), false)->value);
+	SettingsListColourSelected_R = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListColourSelected_R", std::to_string(SettingsListColourSelected_R), false)->value);
+	SettingsListColourSelected_G = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListColourSelected_G", std::to_string(SettingsListColourSelected_G), false)->value);
+	SettingsListColourSelected_B = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListColourSelected_B", std::to_string(SettingsListColourSelected_B), false)->value);
+	SettingsBorderColour_R = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsBorderColour_R", std::to_string(SettingsBorderColour_R), false)->value);
+	SettingsBorderColour_G = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsBorderColour_G", std::to_string(SettingsBorderColour_G), false)->value);
+	SettingsBorderColour_B = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsBorderColour_B", std::to_string(SettingsBorderColour_B), false)->value);
+	SettingsListTextColour_R = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListTextColour_R", std::to_string(SettingsListTextColour_R), false)->value);
+	SettingsListTextColour_G = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListTextColour_G", std::to_string(SettingsListTextColour_G), false)->value);
+	SettingsListTextColour_B = std::stoi(ThemeSettingsColourSection->findOrCreateFirstOption("SettingsListTextColour_B", std::to_string(SettingsListTextColour_B), false)->value);
 	
 	//Save the theme with entries for backwards compatability
 	std::string ThemeFolder = "sdmc:/config/N-Xplorer/Themes/" + ThemeName;
@@ -376,4 +411,19 @@ void SettingsUI::LoadTheme()
 	ContextMenu->LongOpMessageTextColour_R = LongOpMessageTextColour_R;
 	ContextMenu->LongOpMessageTextColour_G = LongOpMessageTextColour_G;
 	ContextMenu->LongOpMessageTextColour_B = LongOpMessageTextColour_B;
+	
+	//Settings UI
+	SettingsList.ListHeaderColour_R = SettingsListHeaderColour_R;
+	SettingsList.ListHeaderColour_G = SettingsListHeaderColour_G;
+	SettingsList.ListHeaderColour_B = SettingsListHeaderColour_B;
+	SettingsList.ListColour_R = SettingsListColour_R;
+	SettingsList.ListColour_G = SettingsListColour_G;
+	SettingsList.ListColour_B = SettingsListColour_B;
+	SettingsList.ListColourSelected_R = SettingsListColourSelected_R;
+	SettingsList.ListColourSelected_G = SettingsListColourSelected_G;
+	SettingsList.ListColourSelected_B = SettingsListColourSelected_B;
+	SettingsList.BorderColour_R = SettingsBorderColour_R;
+	SettingsList.BorderColour_G = SettingsBorderColour_G;
+	SettingsList.BorderColour_B = SettingsBorderColour_B;
+	SettingsList.TextColour = {SettingsListTextColour_R, SettingsListTextColour_G, SettingsListTextColour_B};
 }

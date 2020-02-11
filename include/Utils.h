@@ -12,5 +12,6 @@ std::string GetKeyboardInput(std::string, std::string, std::string);
 std::string GetFileSize(std::string);
 void RecursiveFileCopy(std::string, std::string, std::string);
 std::string GetFileExtension(std::string);
+std::string GetFileNameFromPath(std::string);
 bool GetParentalControl(void);
 void UnzipFile(std::string, std::string);

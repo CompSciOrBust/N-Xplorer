@@ -320,6 +320,18 @@ class SimpleList
 	SDL_Color TextColour = {255, 255, 255};
 	vector <std::string> OptionsTextVec = {"Option one", "Option two", "Option three"};
 	int SelectedOption = 0;
+	int ListHeaderColour_R = 94;
+	int ListHeaderColour_G = 94;
+	int ListHeaderColour_B = 94;
+	int ListColour_R = 66;
+	int ListColour_G = 66;
+	int ListColour_B = 66;
+	int ListColourSelected_R = 161;
+	int ListColourSelected_G = 161;
+	int ListColourSelected_B = 161;
+	int BorderColour_R = 0;
+	int BorderColour_G = 0;
+	int BorderColour_B = 0;
 	//functions
 	SimpleList();
 	void DrawList();
@@ -336,7 +348,7 @@ void SimpleList::DrawList()
 {
 	int ItemCount = (OptionsTextVec.size() + 1);
 	//Draw the outline
-	SDL_SetRenderDrawColor(Renderer, 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(Renderer, BorderColour_R, BorderColour_G, BorderColour_B, 255);
 	int BGWidth = Width * 0.4;
 	int BGHeight = Height * HeightModifier;
 	SDL_Rect BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, BGHeight + (OptionsTextVec.size() * 2)};
@@ -345,7 +357,7 @@ void SimpleList::DrawList()
 	BGWidth -= 4;
 	BGHeight -= 4;
 	BGRect = {(Width - BGWidth) / 2, (Height - BGHeight) / 2, BGWidth, (int)(BGHeight / ItemCount)};
-	SDL_SetRenderDrawColor(Renderer, 94, 94, 94, 255);
+	SDL_SetRenderDrawColor(Renderer, ListHeaderColour_R, ListHeaderColour_G, ListHeaderColour_B, 255);
 	SDL_RenderFillRect(Renderer, &BGRect);
 	//Draw the header text
 	SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(ListOptionFont, HeaderText.c_str(), TextColour, BGWidth);
@@ -359,8 +371,8 @@ void SimpleList::DrawList()
 	{
 		//Draw the rects
 		BGRect.y += BGHeight / ItemCount + 2;
-		if(SelectedOption == i) SDL_SetRenderDrawColor(Renderer, 161, 161, 161, 255);
-		else SDL_SetRenderDrawColor(Renderer, 66, 66, 66, 255);
+		if(SelectedOption == i) SDL_SetRenderDrawColor(Renderer, ListColourSelected_R, ListColourSelected_G, ListColourSelected_B, 255);
+		else SDL_SetRenderDrawColor(Renderer, ListColour_R, ListColour_G, ListColour_B, 255);
 		SDL_RenderFillRect(Renderer, &BGRect);
 		//Draw the text
 		SDL_Surface* MessageTextSurface = TTF_RenderUTF8_Blended_Wrapped(ListOptionFont, OptionsTextVec.at(i).c_str(), TextColour, BGWidth);

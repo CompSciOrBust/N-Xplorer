@@ -137,6 +137,7 @@ int main(int argc, char* argv[])
 	//Init the updater
 	UpdaterUI *Updater = new UpdaterUI();
 	Updater->Renderer = Renderer;
+	Updater->IsDone = DonePtr;
 	Updater->Event = &Event;
 	Updater->WindowState = WindowStatePtr;
 	Updater->Menu = Menu;
@@ -232,8 +233,14 @@ int main(int argc, char* argv[])
 				//Unzip logic
 				case 8:
 				{
+					std::string ExtractionDirName = GetKeyboardInput("Extract", "Folder name", GetFileNameFromPath(*Explorer->ChosenFile));
+					std::string ExtractionPath = Explorer->DirPath + ExtractionDirName + "/";
+					if(ExtractionDirName != "")
+					{
+						mkdir(ExtractionPath.c_str(), 0);
+					}
 					*WindowStatePtr = 4;
-					UnzipFile(*Explorer->ChosenFile, Explorer->DirPath);
+					UnzipFile(*Explorer->ChosenFile, ExtractionPath);
 					*WindowStatePtr = 0;
 					Explorer->LoadListDirs(Explorer->DirPath);
 				}

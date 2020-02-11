@@ -44,7 +44,7 @@ DATA		:=	data
 INCLUDES	:=	include
 APP_AUTHOR := CompSciOrBust
 #ROMFS	:=	romfs
-APP_VERSION := 0.7.0
+APP_VERSION := 0.7.1
 
 #---------------------------------------------------------------------------------
 # options for code generation

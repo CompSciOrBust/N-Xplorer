@@ -78,6 +78,18 @@ class SimpleList
 	SDL_Color TextColour = {255, 255, 255};
 	vector <std::string> OptionsTextVec = {"Option one", "Option two", "Option three"};
 	int SelectedOption = 0;
+	int ListHeaderColour_R = 94;
+	int ListHeaderColour_G = 94;
+	int ListHeaderColour_B = 94;
+	int ListColour_R = 66;
+	int ListColour_G = 66;
+	int ListColour_B = 66;
+	int ListColourSelected_R = 161;
+	int ListColourSelected_G = 161;
+	int ListColourSelected_B = 161;
+	int BorderColour_R = 0;
+	int BorderColour_G = 0;
+	int BorderColour_B = 0;
 	//functions
 	SimpleList();
 	void DrawList();

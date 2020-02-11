@@ -207,10 +207,19 @@ void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string
 
 std::string GetFileExtension(std::string Path)
 {
-	int ExtensionStart = Path.find(".")+1;
+	int ExtensionStart = Path.find_last_of(".")+1;
 	std::string FileSuffix;
 	FileSuffix.assign(Path, ExtensionStart, Path.size() - ExtensionStart);
 	return FileSuffix;
+}
+
+std::string GetFileNameFromPath(std::string Path)
+{
+	int NameStart = Path.find_last_of("/")+1;
+	int ExtensionStart = Path.find_last_of(".");
+	std::string FileName;
+	FileName.assign(Path, NameStart, ExtensionStart - NameStart);
+	return FileName;
 }
 
 bool GetParentalControl()
