@@ -138,6 +138,26 @@ void SettingsUI::UpdateSettingsText()
 			ModeName = "Name Z-A";
 		}
 		break;
+		case 4:
+		{
+			ModeName = "Date created (newest to oldest)";
+		}
+		break;
+		case 5:
+		{
+			ModeName = "Date created (oldest to newest)";
+		}
+		break;
+		case 6:
+		{
+			ModeName = "Date modified (oldest to newest)";
+		}
+		break;
+		case 7:
+		{
+			ModeName = "Date modified (oldest to newest)";
+		}
+		break;
 	}
 	SettingsList.OptionsTextVec.at(0) = BaseText + ModeName;
 	BaseText = "Theme: ";

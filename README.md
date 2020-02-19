@@ -21,6 +21,8 @@ A to open a file / folder
 
 Y to open and close the sub menu
 
+Minus to open the settings
+
 Plus to quick exit
 
 ### Text Editor
@@ -45,10 +47,23 @@ Up / Down buttons to zoom
 
 Left stick to move
 
+### Settings
+Up / Down to move up and down the list
+
+A to select item
+
 ## Credits
 LibNX and DevkitPro for making the toolchain.
 
 [Spitzfire](https://www.youtube.com/channel/UCk9dDQHBmmE3Jy-Xv-tLfeg) for the original logo which I modified.
+
+Nichole Mattera / AtlasNX for making [the INI parser library](https://github.com/AtlasNX/SimpleIniParser) I am using.
+
+[WerWolv](https://github.com/WerWolv) for showing me how to mount save files in Horizon.
+
+XorTroll for [Goldleaf](https://github.com/XorTroll/Goldleaf) which I took some of the updater code from.
+
+nlohmann for making [the JSON library](https://github.com/nlohmann/json) I am using.
 
 Everyone in the Team AtlasNX dev chat for general help in this and other projects.
 

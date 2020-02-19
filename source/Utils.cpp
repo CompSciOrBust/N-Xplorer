@@ -72,6 +72,62 @@ std::vector <dirent> SortFiles(std::string Path, std::vector <dirent> FilesVec, 
 			return tolower(A.d_name[Itterate]) > tolower(B.d_name[Itterate]);
 		});
 		break;
+		//sort by date created (newest to oldest)
+		case 4:
+		std::sort(FilesVec.begin(), FilesVec.end(), [Path](dirent A, dirent B) -> bool{
+			struct stat ABuf;
+			struct stat BBuf;
+			std::string APath = Path + A.d_name;
+			std::string BPath = Path + B.d_name;
+			stat(APath.c_str(), &ABuf);
+			stat(BPath.c_str(), &BBuf);
+			unsigned int ACreated = ABuf.st_ctime;
+			unsigned int BCreated = BBuf.st_ctime;
+			return ACreated < BCreated;
+		});
+		break;
+		//sort by date created (oldest to newest)
+		case 5:
+		std::sort(FilesVec.begin(), FilesVec.end(), [Path](dirent A, dirent B) -> bool{
+			struct stat ABuf;
+			struct stat BBuf;
+			std::string APath = Path + A.d_name;
+			std::string BPath = Path + B.d_name;
+			stat(APath.c_str(), &ABuf);
+			stat(BPath.c_str(), &BBuf);
+			unsigned int ACreated = ABuf.st_ctime;
+			unsigned int BCreated = BBuf.st_ctime;
+			return ACreated > BCreated;
+		});
+		break;
+		//sort by date modified (newest to oldest)
+		case 6:
+		std::sort(FilesVec.begin(), FilesVec.end(), [Path](dirent A, dirent B) -> bool{
+			struct stat ABuf;
+			struct stat BBuf;
+			std::string APath = Path + A.d_name;
+			std::string BPath = Path + B.d_name;
+			stat(APath.c_str(), &ABuf);
+			stat(BPath.c_str(), &BBuf);
+			unsigned int ACreated = ABuf.st_mtime;
+			unsigned int BCreated = BBuf.st_mtime;
+			return ACreated < BCreated;
+		});
+		break;
+		//sort by date modified (oldest to newest)
+		case 7:
+		std::sort(FilesVec.begin(), FilesVec.end(), [Path](dirent A, dirent B) -> bool{
+			struct stat ABuf;
+			struct stat BBuf;
+			std::string APath = Path + A.d_name;
+			std::string BPath = Path + B.d_name;
+			stat(APath.c_str(), &ABuf);
+			stat(BPath.c_str(), &BBuf);
+			unsigned int ACreated = ABuf.st_mtime;
+			unsigned int BCreated = BBuf.st_mtime;
+			return ACreated > BCreated;
+		});
+		break;
 	}
 	return FilesVec;
 }

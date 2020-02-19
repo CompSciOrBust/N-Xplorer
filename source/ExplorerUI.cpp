@@ -174,7 +174,9 @@ void ExplorerUI::GetInput()
 							{
 								printf("%s\n", DirPath.c_str());
 								u64 AppID = SaveMountMap[DirPath];
-								DirPath = "Save";
+								char UniqueSaveMount[7];
+								sprintf(UniqueSaveMount, "Save_%03i", FileNameList->SelectedIndex - 3);
+								DirPath = UniqueSaveMount;
 								printf("%lu\n", AppID);
 								fsdevMountSaveData(DirPath.c_str(), AppID, CurrentUuid);
 								DirPath += ":/";
@@ -239,7 +241,7 @@ void ExplorerUI::GetInput()
 
 void ExplorerUI::ChangeFileSortMode()
 {
-	++FileSortMode %= 4;
+	++FileSortMode %= 8;
 	if(Files.size() == 0) return;
 	std::string CurrentFileName = Files.at(FileNameList->SelectedIndex).d_name;
 	LoadListDirs(DirPath);
