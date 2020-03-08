@@ -220,7 +220,7 @@ void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string
 		while ((ent = readdir(dir)))
 		{
 			//Get path of file we want to copy
-			std::string PathToCopy = SourcePath + "/" +ent->d_name;
+			std::string PathToCopy = SourcePath + "/" + ent->d_name;
 			RecursiveFileCopy(PathToCopy.c_str(), NewDirPath.c_str(), ent->d_name);
 		}
 		closedir(dir);
@@ -239,9 +239,9 @@ void RecursiveFileCopy(std::string SourcePath, std::string DestPath, std::string
 		SourceFile.seekg (0);
 		//Create a 0.25 gb buffer
 		int Chunksize = 1024 * 1024 * 256;
-		char* Buffer = new char[Chunksize];
 		//If the file is smaller than the buffer change the chunk size
 		if(size < Chunksize) Chunksize = size;
+		char* Buffer = new char[Chunksize];
 		//Calculate how much of the file will be left over when split in to chunks
 		int LeftOvers = size % Chunksize;
 		while(SourceFile.tellg() != size - LeftOvers)
