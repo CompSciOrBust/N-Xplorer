@@ -20,7 +20,7 @@ FSFileList loadFiles(std::string Path){
     // If no path given, add in the base devices
     FSFileList fileList;
     if (Path == "") {
-        fileList.push_back(FSEntry("sdmc:"));
+        fileList.push_back(FSEntry("sdmc:/"));
         return fileList;
     }
     // Init vars
